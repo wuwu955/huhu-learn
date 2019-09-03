@@ -135,4 +135,43 @@ es7_02 analysis-icu 7.2.0
 
 ```
 
- 
+###  6 search api
+
+```pwd
+es: GET index_name/_search?q=filedName:query
+
+#URI Query
+GET kibana_sample_data_ecommerce/_search?q=customer_first_name:Eddie
+GET kibana*/_search?q=customer_first_name:Eddie
+GET /_all/_search?q=customer_first_name:Eddie
+
+#REQUEST Body profile 分析查询
+POST kibana_sample_data_ecommerce/_search
+{
+	"profile": true,
+	"query": {
+		"match_all": {}
+	}
+}
+#脚本查法 适用于计算
+
+
+GET kibana_sample_data_ecommerce/_search
+{
+  "script_fields": {
+    "new_field": {
+      "script": {
+        "lang": "painless",
+        "source": "doc['order_date'].value+'hello'"
+      }
+    }
+  },
+  "query": {
+    "match_all": {}
+  }
+}
+
+更改 Mapping 的字段类型 必须重新 reindex api
+```
+
+### 
