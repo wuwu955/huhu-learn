@@ -108,5 +108,33 @@ https://mp.weixin.qq.com/s/QcPicGRkaFENP6IzMRZMaQ
 
 ```
 
+### 9  每秒20W次并发的短文本分词检索，架构如何设计？(这个很酷)
+
+```pwd
+trie :字典树
+总结
+短文本，高并发，支持分词，不用实时更新的检索场景，可以使用：
+（1）ES，杀鸡用牛刀；
+（2）分词+DAT(trie)；
+（3）分词+内存hash；
+等几种方式解决。
+
+https://mp.weixin.qq.com/s/3FMZ2byF2ltSKw3oXnMzTg
+```
+
+### 10 并发扣款，如何保证数据的一致性？（这个思路真的是奇特）
+
+```pwd
+具体到这个case，只需要将：
+UPDATE t_yue SET money=$new_money WHERE uid=$uid;
+升级为：
+UPDATE t_yue SET money=$new_money WHERE uid=$uid AND money=$old_money;
+即可。保证一条线程写入修改数据
+set操作，其实无所谓成功或者失败，业务能通过affect rows来判断：
+写回成功的，affect rows为1
+写回失败的，affect rows为0
+https://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651962738&idx=1&sn=d2d91a380bad06af9f7b9f7a80db26b3&chksm=bd2d08ae8a5a81b8a7f044af52c5e6e77ec3df2bb4a9c91cd450c3fd932e8dade56afb09f784&scene=21#wechat_redirect
+```
+
 
 
