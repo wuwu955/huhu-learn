@@ -1,6 +1,6 @@
-## Mysql 锁知识点
+## 一  Mysql-lock
 
-### 一 锁的类型是哪些
+### 1  锁的类型是哪些
 
 ```pwd
 1 锁按照 范围来说分全局锁（flush tables with read lock）、表锁（table lock）、页面锁(page lock)、行锁(record lock)，按照数据管理划分 读锁(lock in share mode )和写锁(for update)  插入意向锁（intent lock）
@@ -8,7 +8,7 @@
 3 update insert delete 隐式的排他锁
 ```
 
-### 二 什么情况下产生锁
+### 2 什么情况下产生锁
 
 ```pwd
 1 全局锁 数据备份的时候 使用全局锁 保存当前数据库数据 防止数据发生变化 例如 mysqldum -使用参数–single-transaction 的时候，导数据之前就会启动一个事务，来确保拿到一致性视图.
@@ -23,7 +23,7 @@ MDL 是为了数据在增删改查的过程中保持数据表结构不被修改�
 
 ```
 
-### 三 锁等待和死锁的产生
+### 3 锁等待和死锁的产生
 
 1.innodb 存储引擎的锁的实现是根据索引的 加锁的范围要看索引树扫描的数据范围
 
@@ -64,7 +64,7 @@ UPDATE t set c =11 where id =0
 
 
 
-### 四 gap  lock record lock 和 next-key lock  
+### 4 gap  lock record lock 和 next-key lock  
 
 ```wiki
 1 gap lock () 和record lock 组成 next-key lock 每个 next-key lock 是前开后闭区间( ] 主要是 RR 级别下解决幻读的问题
@@ -74,7 +74,7 @@ UPDATE t set c =11 where id =0
 
 ```
 
-### 五 加锁原则
+### 5 加锁原则
 
 ```pwd
 在mysql RR隔离级别下
@@ -86,7 +86,7 @@ UPDATE t set c =11 where id =0
 
 ```
 
-### 六 锁例子
+### 6 锁例子
 
 ```sql
 #DDL
@@ -162,7 +162,7 @@ update t set c =5 where id =15; --锁
 
 
 
-### 六 乐观锁 和悲观锁
+### 7 乐观锁 和悲观锁
 
 ```pwd
 1 乐观锁：认为并发是少几率的发生，不采用数据库自身锁机制，从程序上控制数据的最终结果 例如加个 version 字段区数据的最新版本号 或者是时间戳 第一次读的时候，会获取 version 字段的取值。然后对数据进行更新或删除操作时，会执行 UPDATE ... SET version=version+1 WHERE version=version 。此时如果已经有事务对这条数据进行了更改，修改就不会成功。
@@ -176,9 +176,40 @@ update t set c =5 where id =15; --锁
 
 ```
 
+## 二  innodb 下的mvcc（redo 和undo）
+
+### 1 MVCC 多版本并发控制
+
+```pwd
+数据多版本是一种能够进一步提高并发的方法，它的核心原理是：
+（1）写任务发生时，将数据克隆一份，以版本号区分；
+（2）写任务操作新克隆的数据，直至提交；
+（3）并发读任务可以继续读取旧版本的数据，不至于阻塞；
+举例子
+  1. 最开始数据的版本是V0；
+  2. T1时刻发起了一个写任务，这是把数据clone了一份，进行修改，版本变为V1，但任务还未完成；
+  3. T2时刻并发了一个读任务，依然可以读V0版本的数据；
+  4. T3时刻又并发了一个读任务，依然不会阻塞；
+优点
+  1 读写之间阻塞的问题，通过 MVCC 可以让读写互相不阻塞，即读不阻塞写，写不阻塞读，这样就可以提升事务并发处理能			力。
+  2 降低了死锁的概率。这是因为 MVCC 采用了乐观锁的方式，读取数据时并不需要加锁，对于写操作，也只锁定必要的行。
+  3 解决一致性读的问题。一致性读也被称为快照读，当我们查询数据库在某个时间点的快照时，只能看到这个时间点之前事务提		 交更新的结果，而不能看到这个时间点之后事务提交的更新结果。
+```
+
+### 2  Redo 和 Binlog
+
+```pwd
+1 redo 主要是保证数据库 crash-safe 异常重启后数据不丢失  其实就是 MySQL 里经常说到的 WAL 技术，WAL 的全称是 Write-Ahead Logging，它的关键点就是先写日志，再写磁盘。InnoDB 的 redo log 是固定大小的，比如可以配置为一组 4 个文件，每个文件的大小是 1GB，总共4GB 从头开始写，写到末尾就又回到开头循环写,write pos 是当前记录的位置，一边写一边后移，写到第 3 号文件末尾后就回到 0 号文件开头。checkpoint 是当前要擦除的位置，也是往后推移并且循环的，擦除记录前要把记录更新到数据文件。
+2 binlog 是归档日志 是记录mysql完整的逻辑记录。redo 和binlog 采用两阶段事物提交方式来保证日志逻辑一致。
+在两阶段阶段 这时候redolog只是完成了prepare, 等到binlog写入成功在一起提交事物
 
 
+```
 
+### 3 Undo 和 ReadView
 
+```pwd
 
+https://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651961444&idx=1&sn=830a93eb74ca484cbcedb06e485f611e&chksm=bd2d0db88a5a84ae5865cd05f8c7899153d16ec7e7976f06033f4fbfbecc2fdee6e8b89bb17b&scene=21#wechat_redirect
+```
 
