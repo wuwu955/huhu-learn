@@ -125,16 +125,67 @@ https://mp.weixin.qq.com/s/3FMZ2byF2ltSKw3oXnMzTg
 ### 10 并发扣款，如何保证数据的一致性？（这个思路真的是奇特）
 
 ```pwd
-具体到这个case，只需要将：
-UPDATE t_yue SET money=$new_money WHERE uid=$uid;
-升级为：
-UPDATE t_yue SET money=$new_money WHERE uid=$uid AND money=$old_money;
-即可。保证一条线程写入修改数据
-set操作，其实无所谓成功或者失败，业务能通过affect rows来判断：
-写回成功的，affect rows为1
-写回失败的，affect rows为0
-https://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651962738&idx=1&sn=d2d91a380bad06af9f7b9f7a80db26b3&chksm=bd2d08ae8a5a81b8a7f044af52c5e6e77ec3df2bb4a9c91cd450c3fd932e8dade56afb09f784&scene=21#wechat_redirect
+一 具体到这个case，只需要将：
+  UPDATE t_yue SET money=$new_money WHERE uid=$uid;
+  升级为：
+  UPDATE t_yue SET money=$new_money WHERE uid=$uid AND money=$old_money;
+  即可。保证一条线程写入修改数据
+  set操作，其实无所谓成功或者失败，业务能通过affect rows来判断：
+  写回成功的，affect rows为1
+  写回失败的，affect rows为0
+  
+二 结合上面的sql 写法会存在CAS ABA 问题
+  ABA 简而言之 就是
+  1 线程读取出指定内存地址的数据A，加载到寄存器
+  2 线程占到cpu读取出指定内存地址的数据A，加载到寄存器，并修改值B到内存地址
+  3 线程又占到cpu读取出指定内存地址的数据B 并修改值A到内存地址
+  最后1 线程修改成功 但是A 已经发生了变化
+  所以上面的sql 修改为（加version）
+  UPDATE t_yue SET money=$new_money, version=$version_new WHERE uid=$uid AND version=$version_old
+
+三 并发扣款一致性 幂等性问题
+一般使用：
+select&set，配合CAS方案
+而不使用：
+set money-=X方案
+
+微信文章地址
+https://mp.weixin.qq.com/s/QSpBDlW1KktJ8iHaYcO2rw
+https://mp.weixin.qq.com/s/03ndQ7k2ehQzYVDYgCpWHQ
+https://mp.weixin.qq.com/s/xXju0y64KKUiD06QE0LoeA
+
+```
+
+### 11 架构师之路18年精选100篇
+
+```pwd
+架构设计，运维，数据库，数据结构算法，缓存
+https://mp.weixin.qq.com/s/V1hGa6D9aGrP6PiCWEmc0w
 ```
 
 
+
+### 12 chmod 755 究竟是什么鬼？
+
+```PWD
+文件创建后，有三种访问方式：
+读(read)：显示内容
+写(write)：编辑内容，删除文件
+执行(execute)：执行文件
+
+针对用户，文件有三类权限：
+创建人(user)权限：创建文件的人
+组(group)用户权限：和拥有者处于同一用户组的其他人
+其他(other)用户权限
+3位对应位的对应数字加起来，最终就是三类用户的最终权限。
+例子
+chmod 755 xxx.sh
+第一位7：4+2+1，创建者，可读可写可执行
+第二位5：4+1，组用户，可读可执行
+第三位5：4+1，其他用户，可读可执行
+
+https://mp.weixin.qq.com/s/OwoOYbmElD0S6WMQ2LNS1A
+
+
+```
 
