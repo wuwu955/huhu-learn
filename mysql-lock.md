@@ -6,6 +6,16 @@
 1 锁按照 范围来说分全局锁（flush tables with read lock）、表锁（table lock）、页面锁(page lock)、行锁(record lock)，按照数据管理划分 读锁(lock in share mode )和写锁(for update)  插入意向锁（intent lock）
 2 MyISAM 存储引擎只有表锁 不支持行锁 innodb 存储引擎 支持行锁
 3 update insert delete 隐式的排他锁
+
+本质上，这些都是InnoDB锁机制的问题。总的来说，InnoDB共有七种类型的锁：
+  (1)共享/排它锁(Shared and Exclusive Locks)
+  (2)意向锁(Intention Locks) 表锁
+  (3)记录锁(Record Locks)
+  (4)间隙锁(Gap Locks)
+  (5)临键锁(Next-key Locks) cap +record
+  (6)插入意向锁(Insert Intention Locks) gap lock中的一种
+  (7)自增锁(Auto-inc Locks) 表锁 与此同时，InnoDB提供了innodb_autoinc_lock_mode配置，可以调节与改变该锁的模式与行为。
+
 ```
 
 ### 2 什么情况下产生锁
@@ -60,6 +70,8 @@ UPDATE t set c =11 where id =0
 
 #主要是 死锁自动检测  SHOW VARIABLES LIKE 'innodb_deadlock_detect' 为on 代表是发生死锁自动结束一个线程
 但是每次都要检查看有没有和之前的线程造成冲突所以浪费cpu资源
+还可以 通过 show engine innodb status; 来查看
+
 ```
 
 
@@ -245,4 +257,43 @@ Read View
 https://mp.weixin.qq.com/s/R3yuitWpHHGWxsUcE0qIRQ
 https://time.geekbang.org/column/article/120351
 ```
+
+### 4 为什么innodb 并发性能好？
+
+```pwd
+1 行锁，对提高并发帮助很大
+2 多版本并发控制 支持事物 主要是的mvcc 减少了锁的范围和几率
+3 共享/排它锁的潜在问题是，不能充分的并行，解决思路是数据多版本
+其他 答案
+(1)InnoDB使用共享锁，可以提高读读并发；
+(2)为了保证数据强一致，InnoDB使用强互斥锁，保证同一行记录修改与删除的串行性；
+(3)InnoDB使用插入意向锁，可以提高插入并发；多个事务，在同一个索引，同一个范围区间插入记录时，如果插入的位置不冲突，不会阻塞彼此。
+
+```
+
+### 5 mysql 事物隔离级别
+
+```pwd
+
+(1)读未提交：select不加锁，可能出现读脏；
+(2)读提交(RC)：普通select快照读，锁select /update /delete 会使用记录锁，可能出现不可重复读；
+(3)可重复读(RR)：普通select快照读，锁select /update /delete 根据查询条件情况，会选择记录锁，或者间隙锁/临键锁，以防止读取到幻影记录；
+(4)串行化：select隐式转化为select ... in share mode，会被update与delete互斥；
+
+InnoDB默认的隔离级别是RR，用得最多的隔离级别是RC,单纯在隔离级别上 RR 只是解决了脏读和不可重复读的情况，他还是根据next key-lock 来解决幻读问题
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
