@@ -203,13 +203,46 @@ update t set c =5 where id =15; --锁
 2 binlog 是归档日志 是记录mysql完整的逻辑记录。redo 和binlog 采用两阶段事物提交方式来保证日志逻辑一致。
 在两阶段阶段 这时候redolog只是完成了prepare, 等到binlog写入成功在一起提交事物
 
+3 redo log 设计的第二点 是将随机写改成顺序写 极大减少了数据库io时间
+详情见
+https://time.geekbang.org/column/article/68633
+
 
 ```
 
 ### 3 Undo 和 ReadView
 
 ```pwd
+Undo
+  1 undo 简单就是记录未提交事物的行记录 对于insert操作，undo日志记录新数据的PK(ROW_ID)，回滚时直接删除，
+  对于delete/update操作，undo日志记录旧数据row，回滚时直接恢复；
 
-https://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651961444&idx=1&sn=830a93eb74ca484cbcedb06e485f611e&chksm=bd2d0db88a5a84ae5865cd05f8c7899153d16ec7e7976f06033f4fbfbecc2fdee6e8b89bb17b&scene=21#wechat_redirect
+  2 InnoDB的内核，会对所有row数据增加三个内部属性：
+    (1)db_trx_id，6字节，记录每一行最近一次修改它的事务ID；
+    (2)db_roll_ptr，7字节，记录指向回滚段undo日志的指针；
+    (3)db_row_id，6字节，单调递增的行ID；
+
+  3 一条未提交的事物在我们可以根据 db_roll_ptr （undo 日志指针）在回滚段中遍历改指针链表找到db_trx_id记录
+ 
+Read View
+   Read View 保存了当前事务开启时所有活跃（还没有提交）的事务列表，换个角度你可以理解为 Read View 保存了不应       	 该让这个事务看到的其他的事务 ID 列表。
+	 read view 然后根据 trx_id 来和最小 最大trx_id 比较 遍历是否存在 等一些判断逻辑来 判断该事物节点 之前的那	些数据看的到，之后的那些数据看不到
+	
+查询记录流程
+  首先获取事务自己的版本号，也就是事务 ID；
+  获取 Read View；（trx_ids）
+  查询得到的数据，然后与 Read View 中的事务版本号进行比较；
+  如果不符合 ReadView 规则，就需要从 Undo Log 中获取历史快照；
+  最后返回符合规则的数据。
+
+ 不同隔离级别下的ReadView
+   InnoDB之所以并发高，快照读不加锁（一致性不加锁的读） select * from xx；读提交事物的数据和自身事物修改 的数据 
+   RC 时，每次SELECT操作都创建Read View，无论SELECT是否相同，所以可能出现前后两次读到的结果不等，即不可重复读。
+   RR 时，首次SELECT操作才创建Read View并复用给后续的相同SELECT操作，前后两次读到的结果一定相等，避免了不可重复读。
+ 
+
+详情见
+https://mp.weixin.qq.com/s/R3yuitWpHHGWxsUcE0qIRQ
+https://time.geekbang.org/column/article/120351
 ```
 
