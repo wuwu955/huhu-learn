@@ -66,9 +66,34 @@ location /file/ {
 
 
 ```
-
-
-
+### 5 docker 安装redis 
+```pwd
+#拉取镜像
+docker pull redis:5.0.2
+#创建容器
+docker create --name redis-node01 -v /data/redis-data/node01:/data -p 6379:6379 redis:5.0.2 --cluster-enabled yes --cluster-config-file nodes-node-01.conf
+docker create --name redis-node02 -v /data/redis-data/node02:/data -p 6380:6379
+redis:5.0.2 --cluster-enabled yes --cluster-config-file nodes-node-02.conf
+docker create --name redis-node03 -v /data/redis-data/node03:/data -p 6381:6379
+redis:5.0.2 --cluster-enabled yes --cluster-config-file nodes-node-03.conf
+#启动容器
+docker start redis-node01 redis-node02 redis-node03
+#开始组建集群 #进入redis-node01进行操作
+docker exec -it redis-node01 /bin/bash
+#组建集群 172.16.55.185是主机的ip地址
+redis-cli --cluster create 172.16.55.185:6379 172.16.55.185:6380 172.16.55.185:6381
+--cluster-replicas 0
+这里要好好学一下 day7文档
+#查看集群信息
+/data# redis-cli
+127.0.0.1:6379> CLUSTER NODES
+46e5582cd2d96a506955cc08e7b08343037c91d9 172.16.55.185:6380@16380 master - 0
+1543766975796 2 connected 5461-10922
+b42d6ccc544094f1d8f35fa7a6d08b0962a6ac4a 172.16.55.185:6381@16381 master - 0
+1543766974789 3 connected 10923-16383
+4c60f45d1722f771831c64c66c141354f0e28d18 172.16.55.185:6379@16379 myself,master - 0
+1543766974000 1 connected 0-5460
+```
 
 
 
