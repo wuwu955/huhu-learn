@@ -245,5 +245,74 @@ listenPort=10611
 docker start rmqserver01 rmqserver02
 docker start rmqbroker01 rmqbroker02 rmqbroker03 rmqbroker04
 ```
+### 9  docker 安装 elk
 
+```pwd
+#拉取镜像
+docker pull elasticsearch:6.5.4 
+#创建容器
+docker create --name elasticsearch --net host -e "discovery.type=single-node" -e "network.host=172.16.55.185" elasticsearch:6.5.4
+#启动
+docker start elasticsearch
+#查看日志
+docker logs elasticsearch
+
+#安装  elasticsearch-head
+https://chrome.google.com/webstore/detail/elasticsearch-head/ffmkiejjmecolpfloofpjologoblkegm
+
+#安装 ik
+#安装方法:将下载到的elasticsearch-analysis-ik-6.5.4.zip解压到/elasticsearch/plugins/ik 目录下即可。
+#如果使用docker运行
+docker cp /tmp/elasticsearch-analysis-ik-6.5.4.zip elasticsearch:/usr/share/elasticsearch/plugins/ #进入容器
+docker exec -it elasticsearch /bin/bash
+mkdir /usr/share/elasticsearch/plugins/ik
+cd /usr/share/elasticsearch/plugins/ik
+unzip elasticsearch-analysis-ik-6.5.4.zip
+#重启容器即可
+docker restart elasticsearch
+```
+### 10 docker安装elastic 集群
+
+```pwd
+
+mkdir /haoke/es-cluster
+cd /haoke/es-cluster
+mkdir node01
+mkdir node02
+#复制安装目录下的elasticsearch.yml、jvm.options文件，做如下修改 #node01的配置:
+cluster.name: es-itcast-cluster
+node.name: node01
+node.master: true
+node.data: true
+network.host: 172.16.55.185
+http.port: 9200
+discovery.zen.ping.unicast.hosts: ["172.16.55.185"]
+discovery.zen.minimum_master_nodes: 1
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+
+#node02的配置:
+cluster.name: es-itcast-cluster
+node.name: node02
+node.master: false
+node.data: true
+network.host: 172.16.55.185
+http.port: 9201
+discovery.zen.ping.unicast.hosts: ["172.16.55.185"] discovery.zen.minimum_master_nodes: 1 http.cors.enabled: true
+http.cors.allow-origin: "*"
+
+#创建容器
+docker create --name es-node01 --net host -v /haoke/es- cluster/node01/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /haoke/es-cluster/node01/jvm.options:/usr/share/elasticsearch/config/jvm.options -v /haoke/es-cluster/node01/data:/usr/share/elasticsearch/data elasticsearch:6.5.4
+docker create --name es-node02 --net host -v /haoke/es-
+cluster/node02/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+-v /haoke/es-cluster/node02/jvm.options:/usr/share/elasticsearch/config/jvm.options
+-v /haoke/es-cluster/node02/data:/usr/share/elasticsearch/data elasticsearch:6.5.4
+
+#启动容器
+docker start es-node01 && docker logs -f es-node01
+docker start es-node02 && docker logs -f es-node02
+#提示:启动时会报文件无权限操作的错误，需要对node01和node02进行chmod 777 的操作
+#查看响应
+http://172.16.55.185:9200/_cluster/health
+```
 
