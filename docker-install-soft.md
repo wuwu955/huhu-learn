@@ -96,7 +96,154 @@ b42d6ccc544094f1d8f35fa7a6d08b0962a6ac4a 172.16.55.185:6381@16381 master - 0
 #这里要好好学一下 day7文档
 
 ```
+### 6 docker安装mongodb
 
+```pwd
+#拉取镜像
+docker pull mongo:4.0.3
+#创建容器
+docker create --name mongodb -p 27017:27017 -v /data/mongodb:/data/db mongo:4.0.3
+#启动容器
+docker start mongodb
+#进入容器
+docker exec -it mongodb /bin/bash
+#使用MongoDB客户端进行操作 mongo
+> show dbs #查询所有的数据库 admin 0.000GB
+config 0.000GB
+local 0.000GB
 
+```
+### 7 docker安装rocketMq
+
+```pwd
+#拉取镜像
+docker pull foxiswho/rocketmq:server-4.3.2 docker pull foxiswho/rocketmq:broker-4.3.2
+#创建nameserver容器
+docker create -p 9876:9876 --name rmqserver \
+-e "JAVA_OPT_EXT=-server -Xms128m -Xmx128m -Xmn128m" \ -e "JAVA_OPTS=-Duser.home=/opt" \
+-v /haoke/rmq/rmqserver/logs:/opt/logs \
+-v /haoke/rmq/rmqserver/store:/opt/store \ foxiswho/rocketmq:server-4.3.2
+#创建broker容器
+docker create -p 10911:10911 -p 10909:10909 --name rmqbroker \
+-e "JAVA_OPTS=-Duser.home=/opt" \
+-e "JAVA_OPT_EXT=-server -Xms128m -Xmx128m -Xmn128m" \
+-v /haoke/rmq/rmqbroker/conf/broker.conf:/etc/rocketmq/broker.conf \ -v /haoke/rmq/rmqbroker/logs:/opt/logs \
+-v /haoke/rmq/rmqbroker/store:/opt/store \ foxiswho/rocketmq:broker-4.3.2
+#启动容器
+docker start rmqserver rmqbroker
+#停止删除容器
+docker stop rmqbroker rmqserver docker rm rmqbroker rmqserver
+安装 管理台https://github.com/apache/rocketmq-externals/tree/master/rocketmq-console
+#拉取镜像
+docker pull styletang/rocketmq-console-ng:1.0.0
+#创建并启动容器
+docker run -e "JAVA_OPTS=-Drocketmq.namesrv.addr=172.16.55.185:9876 - Dcom.rocketmq.sendMessageWithVIPChannel=false" -p 8082:8080 -t styletang/rocketmq- console-ng:1.0.0
+
+```
+### 8 docker安装rocketMq 2m2s（两主两从）
+```pwd
+
+#创建2个master
+#nameserver1
+docker create -p 9876:9876 --name rmqserver01 \
+-e "JAVA_OPT_EXT=-server -Xms128m -Xmx128m -Xmn128m" \ -e "JAVA_OPTS=-Duser.home=/opt" \
+-v /haoke/rmq/rmqserver01/logs:/opt/logs \
+-v /haoke/rmq/rmqserver01/store:/opt/store \ foxiswho/rocketmq:server-4.3.2
+
+#nameserver2
+docker create -p 9877:9876 --name rmqserver02 \
+-e "JAVA_OPT_EXT=-server -Xms128m -Xmx128m -Xmn128m" \
+-e "JAVA_OPTS=-Duser.home=/opt"  \
+-v /haoke/rmq/rmqserver02/logs:/opt/logs \
+-v /haoke/rmq/rmqserver02/store:/opt/store \
+foxiswho/rocketmq:server-4.3.2
+
+#创建第1个master broker
+#master broker01
+docker create --net host --name rmqbroker01 \
+-e "JAVA_OPTS=-Duser.home=/opt" \
+-e "JAVA_OPT_EXT=-server -Xms128m -Xmx128m -Xmn128m" \
+-v /haoke/rmq/rmqbroker01/conf/broker.conf:/etc/rocketmq/broker.conf \ -v /haoke/rmq/rmqbroker01/logs:/opt/logs \
+-v /haoke/rmq/rmqbroker01/store:/opt/store \ foxiswho/rocketmq:broker-4.3.2
+
+#配置
+namesrvAddr=172.16.55.185:9876;172.16.55.185:9877
+brokerClusterName=HaokeCluster
+brokerName=broker01
+brokerId=0
+deleteWhen=04
+fileReservedTime=48
+brokerRole=SYNC_MASTER
+flushDiskType=ASYNC_FLUSH
+brokerIP1=172.16.55.185
+brokerIp2=172.16.55.185
+listenPort=10911
+
+#创建第2个master broker
+#master broker02
+docker create --net host --name rmqbroker02 \
+-e "JAVA_OPTS=-Duser.home=/opt" \
+-e "JAVA_OPT_EXT=-server -Xms128m -Xmx128m -Xmn128m" \
+-v /haoke/rmq/rmqbroker02/conf/broker.conf:/etc/rocketmq/broker.conf \ -v /haoke/rmq/rmqbroker02/logs:/opt/logs \
+-v /haoke/rmq/rmqbroker02/store:/opt/store \ foxiswho/rocketmq:broker-4.3.2
+
+#master broker02
+namesrvAddr=172.16.55.185:9876;172.16.55.185:9877
+brokerClusterName=HaokeCluster
+brokerName=broker02
+brokerId=0
+deleteWhen=04
+fileReservedTime=48
+brokerRole=SYNC_MASTER
+flushDiskType=ASYNC_FLUSH
+brokerIP1=172.16.55.185
+brokerIp2=172.16.55.185
+listenPort=10811
+
+#创建第1个slave broker
+#slave broker01
+docker create --net host --name rmqbroker03 \
+-e "JAVA_OPTS=-Duser.home=/opt" \
+-e "JAVA_OPT_EXT=-server -Xms128m -Xmx128m -Xmn128m" \
+-v /haoke/rmq/rmqbroker03/conf/broker.conf:/etc/rocketmq/broker.conf \ -v /haoke/rmq/rmqbroker03/logs:/opt/logs \
+-v /haoke/rmq/rmqbroker03/store:/opt/store \ foxiswho/rocketmq:broker-4.3.2
+
+#slave broker01
+namesrvAddr=172.16.55.185:9876;172.16.55.185:9877
+brokerClusterName=HaokeCluster
+brokerName=broker01
+brokerId=1
+deleteWhen=04
+fileReservedTime=48
+brokerRole=SLAVE
+flushDiskType=ASYNC_FLUSH
+brokerIP1=172.16.55.185
+brokerIp2=172.16.55.185
+listenPort=10711
+
+#创建第2个slave broker
+#slave broker01
+docker create --net host --name rmqbroker04 \
+-e "JAVA_OPTS=-Duser.home=/opt" \
+-e "JAVA_OPT_EXT=-server -Xms128m -Xmx128m -Xmn128m" \
+-v /haoke/rmq/rmqbroker04/conf/broker.conf:/etc/rocketmq/broker.conf \ -v /haoke/rmq/rmqbroker04/logs:/opt/logs \
+-v /haoke/rmq/rmqbroker04/store:/opt/store \ foxiswho/rocketmq:broker-4.3.2
+#slave broker02
+namesrvAddr=172.16.55.185:9876;172.16.55.185:9877
+brokerClusterName=ItcastCluster
+brokerName=broker02
+brokerId=1
+deleteWhen=04
+fileReservedTime=48
+brokerRole=SLAVE
+flushDiskType=ASYNC_FLUSH
+brokerIP1=172.16.55.185
+brokerIp2=172.16.55.185
+listenPort=10611
+
+#启动容器
+docker start rmqserver01 rmqserver02
+docker start rmqbroker01 rmqbroker02 rmqbroker03 rmqbroker04
+```
 
 
