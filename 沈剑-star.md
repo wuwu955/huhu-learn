@@ -188,4 +188,33 @@ https://mp.weixin.qq.com/s/OwoOYbmElD0S6WMQ2LNS1A
 
 
 ```
+### 13 跨库分页的几种常见方案（最后页的数据）
+
+```pwd
+将
+select xxx from t order by yyy limit 0,10
+转化为
+select xxx from t where yyy>next_begin  limit 10
+就是说先where 条件过滤 在分页数据
+
+https://mp.weixin.qq.com/s/H_2hyEqQ70Y_OoFZh_P_5A
+```
+
+### 14 每秒100W请求，12306秒杀业务，架构如何优化
+
+```pwd
+秒杀业务，可以使用典型的服务化分层架构：
+ 端（浏览器/APP） 限制用户提交次数
+ 站点层 登陆授权 对同一个uid的请求进行计数和限速 超过的返回上一次的页面缓存 服务水平扩容和降级
+ 服务层 对列（写请求 mq ）和缓存（读请求 redis）
+ 数据层 分库分表 搭建高可用集群
+总结
+ 对于秒杀系统，除了产品和业务上的折衷，架构设计上主要有两大优化方向：
+（1）尽量将请求拦截在系统上游；
+（2）读多写少用缓存；
+（3）业务折衷；
+
+https://mp.weixin.qq.com/s/WSocbTKWYBqOSfimdfm_JA
+```
+
 
