@@ -40,7 +40,7 @@
 所以 正则表达式 多用 独占模式
 ```
 
-### ArrayList 和LinkList 性能对比
+### 3 ArrayList 和LinkList 性能对比
 
 ```pwd
 1 增删方面 arraryList 如果是在头部地方 增加和删除性能比linkList 差 ，如果是在尾部添加元素没有扩容的话 性能比linkList好 但是扩容的就不一样了 中间的都差不多
@@ -48,3 +48,16 @@
 
 ```
 
+
+### 4 分库分表的中间间 及分页查询
+
+```pwd
+中间件 sharing-jdbc（嵌入式）  mycat（proxy）性能差点
+分页 将每个分表的数据查询出来 通过归并排序计算出来 stream api 
+paralle 并行流 在处理集合时 如果时线程不安全的集合 就会有线程不安全的问题
+stream  api 在处理大数据量集合比较好 对机器的cpu 要求时 多核 并行处理的效率比较高
+
+
+
+
+```
