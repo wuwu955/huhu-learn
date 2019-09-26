@@ -83,4 +83,9 @@ stream  api 在处理大数据量集合比较好 对机器的cpu 要求时 多�
  多路复用器（Selector）Selector 是基于事件驱动实现的，我们可以在 Selector 中注册 accpet、read 监听事件，Selector 会不断轮询注册在其上的 Channel，如果某个 Channel 上面发生监听事件，这个 Channel 就处于就绪状态，然后进行 I/O 操作。 避免阻塞
 
 ```
+### 7 RPC 框架序列列化优化
+
+```pwd
+看一下 dubbo 采用protobuf 序列化协议
+```
 
