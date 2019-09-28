@@ -87,5 +87,17 @@ stream  api 在处理大数据量集合比较好 对机器的cpu 要求时 多�
 
 ```pwd
 看一下 dubbo 采用protobuf 序列化协议
+这里是dubbo 序列化扩展 目前没有扩展 protobuf协议 但是扩展了Kryo 可以参考KryoSerialization 实现方式实现 但是这个序列化方式在分布式环境下存在坑
+官方文档 http://dubbo.apache.org/zh-cn/docs/dev/impls/serialize.html
+
+最后，需要手动在 classpath 下创建 META-INF/dubbo/internel/org.apache.dubbo.common.serialize.Serialization 路径。 文件名称为：
+org.apache.dubbo.common.serialize.Serialization。在该文件中写入自己的实现类，及该实现的 schema。例如：
+protobuf=org.apache.dubbo.common.serialize.protocol.ProtobufSerialization
+
+将自己的实现打包，注意打包的时候，一定要将 /META-INF 文件夹下的所有内容都打包进去。否则，将不会被 classloader 加载到，进而报错！
+
+引入
+<dubbo:protocol serialization="xxx" />
+
 ```
 
