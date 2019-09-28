@@ -107,7 +107,7 @@ protobuf=org.apache.dubbo.common.serialize.protocol.ProtobufSerialization
 查看命宁 sysctl -a | grep net.xxx （sysctl -a | grep net.ipv4.tcp_keepalive_time）
 修改某项配置，可以通过编辑 vim/etc/sysctl.conf，加入需要修改的配置项， 并通过 sysctl -p 命令运行生效修改后的配置项设置。
 下面配置提高网络吞吐量和降低延时
+```
 ![storage](https://static001.geekbang.org/resource/image/9e/bc/9eb01fe017b267367b11170a864bd0bc.jpg)
 
-```
 
