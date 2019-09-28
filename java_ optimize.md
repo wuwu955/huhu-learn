@@ -48,7 +48,6 @@
 
 ```
 
-
 ### 4 分库分表的中间间 及分页查询
 
 ```pwd
@@ -57,6 +56,7 @@
 paralle 并行流 在处理集合时 如果时线程不安全的集合 就会有线程不安全的问题
 stream  api 在处理大数据量集合比较好 对机器的cpu 要求时 多核 并行处理的效率比较高
 ```
+
 ### 5 hashMap 原理和优化
 ```pwd
  基于 数组加链表的数据结构来实现，通过将 Key 的 hash 值与 length-1 进行 & 运算，实现了当前 Key 的定位（存储位置），2 的幂次方可以减少冲突（碰撞）的次数，提高 HashMap 查询效率；如果相同node 超过8个 就会生成红黑树来存储 查询时间复杂度O（log(n)）
@@ -98,6 +98,16 @@ protobuf=org.apache.dubbo.common.serialize.protocol.ProtobufSerialization
 
 引入
 <dubbo:protocol serialization="xxx" />
+
+```
+
+### 8 linux tcp 参数查看和优化
+
+```pwd
+查看命宁 sysctl -a | grep net.xxx （sysctl -a | grep net.ipv4.tcp_keepalive_time）
+修改某项配置，可以通过编辑 vim/etc/sysctl.conf，加入需要修改的配置项， 并通过 sysctl -p 命令运行生效修改后的配置项设置。
+下面配置提高网络吞吐量和降低延时
+![storage](https://static001.geekbang.org/resource/image/9e/bc/9eb01fe017b267367b11170a864bd0bc.jpg)
 
 ```
 
