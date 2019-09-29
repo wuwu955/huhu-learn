@@ -110,4 +110,26 @@ protobuf=org.apache.dubbo.common.serialize.protocol.ProtobufSerialization
 ```
 ![storage](https://static001.geekbang.org/resource/image/9e/bc/9eb01fe017b267367b11170a864bd0bc.jpg)
 
+### 9 jdk 1.6后Synchronized 锁优化（分级锁）
+```pwd
+1. 检测Mark Word里面是不是当前线程ID,如果是,表示当前线程处于偏向锁
+2. 如果不是,则使用CAS将当前线程ID替换到Mark Word,如果成功则表示当前线程获得偏向锁,设置偏向标志位1
+3. 如果失败,则说明发生了竞争,撤销偏向锁,升级为轻量级锁
+4. 当前线程使用CAS将对象头的mark Word锁标记位替换为锁记录指针,如果成功,当前线程获得锁
+5. 如果失败,表示其他线程竞争锁,当前线程尝试通过自旋获取锁 for(;;)
+6. 如果自旋成功则依然处于轻量级状态
+7. 如果自旋失败,升级为重量级锁
+   - 索指针:在当前线程的栈帧中划出一块空间,作为该锁的锁记录,并且将锁对象的标记字段复制到改锁记录中!
+这里注意  锁状态只能升级不能降级。
+     // 修饰普通方法
+	public synchronized void method1() {
+	    // code
+	}
+	// 修饰静态方法
+	public  synchronized static void method2() {
+	    // code
+	}
+这里 锁普通方法和锁静态方法的区别是 普通方法中的锁是锁对象，而修饰静态方法是类锁 粒度更大
+
+```
 
