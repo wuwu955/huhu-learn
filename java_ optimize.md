@@ -110,7 +110,7 @@ protobuf=org.apache.dubbo.common.serialize.protocol.ProtobufSerialization
 ```
 ![storage](https://static001.geekbang.org/resource/image/9e/bc/9eb01fe017b267367b11170a864bd0bc.jpg)
 
-## 二 2019年09月29日 锁优化
+## 二 2019年09月29日 多线程模块
 ### 1 jdk 1.6后Synchronized 锁优化（分级锁）
 ```pwd
 1. 检测Mark Word里面是不是当前线程ID,如果是,表示当前线程处于偏向锁
