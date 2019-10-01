@@ -191,7 +191,21 @@ ABA问题的解决思路
 ```
 ![storage](https://static001.geekbang.org/resource/image/6d/99/6d6371fda6214743d69c54528cd8ff99.jpg)
 
+### 6 线程池参数设置优化
+```pwd
+1 ThreadPoolExecutor 参数
+int corePoolSize,// 线程池的核心线程数量 cpu 计算密集型为 n+1，io 密集型为2n+1 如果是4核的情况下就是4+1
+int maximumPoolSize,// 线程池的最大线程数 超过这个数字 就会拒绝抛出异常
+long keepAliveTime,// 当线程数大于核心线程数时，多余的空闲线程存活的最长时间
+TimeUnit unit,// 时间单位
+BlockingQueue<Runnable> workQueue,// 任务队列，用来储存等待执行任务的队列 这个队列设置界限 不然会 oom 
+ThreadFactory threadFactory,// 线程工厂，用来创建线程，一般默认即可
+RejectedExecutionHandler handler) // 拒绝策略，当提交的任务过多而不能及时处理时，我们可以定制策略来处理任务
 
+2 如果队列满了，就会新增线程来执行任务，如果已经是最大线程数量，则会执行拒绝策略。如果未到达最大线程和队列没有满 也是创建非核心线程分配任务
+如下线程分配流程
+```
+![storage](https://static001.geekbang.org/resource/image/b1/b0/b13aa36ef3b15a98fab1755ac36101b0.jpg)
 
 
 
