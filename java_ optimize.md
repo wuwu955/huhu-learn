@@ -98,7 +98,7 @@ protobuf=org.apache.dubbo.common.serialize.protocol.ProtobufSerialization
 
 引入
 <dubbo:protocol serialization="xxx" />
-
+补充一下 duboo 2.7 版本已经实现了这个接口 可以直接用了 https://github.com/apache/dubbo
 ```
 
 ### 8 linux tcp 参数查看和优化
