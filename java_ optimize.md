@@ -162,7 +162,12 @@ ABA问题的解决思路
 当升级到重量级锁后，线程竞争锁资源，将会进入等待队列中，并在等待队列中不断尝试获取锁资源。每次去获取锁资源，都需要通过系统调底层操作系统申请获取Mutex Lock，这个过程就是一次用户态和内核态的切换。
 5：什么是进程的上下文切换？什么是线程的上下文切换？
 进程间的上下文切换因为是用户态和内核态之间的切换，需要消耗更多的资源，例如，寄存器中的内容切换出，缓存的刷新等，而线程间的上下文切换是用户态的线程切换，由于是同一个虚拟内存，消耗资源相对较少。
-6：在 Linux 系统下，可以使用 Linux 内核提供的 vmstat 命令，来监视 Java 程序运行过程中系统的上下文切换频率
+6：在 Linux 系统下，可以使用 Linux 内核提供的 vmstat， pidstat ，JDK 工具之 jstack  命令，来监视 Java 程序运行过程中系统的上下文切换频率
+例子 
+vmstat 1 3  命令行代表每秒收集一次性能指标，总共获取 3 次。
+pidstat -w -p pid 命令行，我们可以查看到进程的上下文切换
+pidstat -w -p pid -t 命令行，我们可以查看到具体线程的上下文切换：
+jstack pid 命令查看线程堆栈信息，通常是结合 pidstat -p pid -t 一起查看具体线程的状态，也经常用来排查一些死锁的异常。
 
 ```
 ### 4 什么原因造成上下文切换，怎么优化
@@ -207,5 +212,17 @@ RejectedExecutionHandler handler) // 拒绝策略，当提交的任务过多而�
 ```
 ![storage](https://static001.geekbang.org/resource/image/b1/b0/b13aa36ef3b15a98fab1755ac36101b0.jpg)
 
+### 7 多线程队列
+```pwd
+1 阻塞队列 blockQueue
+ ArrayBlockingQueue：数组结构阻塞队列，按 FIFO（先进先出）原则对元素进行排序，使用 ReentrantLock、Condition 来实现线程安全；
+ LinkedBlockingQueue：链表结构阻塞队列，同样按 FIFO （先进先出） 原则对元素进行排序，使用 ReentrantLock、Condition 来实现线程安全，吞吐量通常  要高于 ArrayBlockingQueue；
+ PriorityBlockingQueue：一个具有优先级的无限阻塞队列，基于二叉堆结构实现的无界限（最大值 Integer.MAX_VALUE - 8）阻塞队列，队列没有实现排序，但每当有数据变更时，都会将最小或最大的数据放在堆最上面的节点上，该队列也是使用了 ReentrantLock、Condition 实现的线程安全；
+ DelayQueue：一个支持延时获取元素的无界阻塞队列，基于 PriorityBlockingQueue 扩展实现，与其不同的是实现了 Delay 延时接口；
+ SynchronousQueue：一个不存储多个元素的阻塞队列，每次进行放入数据时, 必须等待相应的消费者取走数据后，才可以再次放入数据，该队列使用了两种模式来管理元素，一种是使用先进先出的队列，一种是使用后进先出的栈，使用哪种模式可以通过构造函数来指定。
+2 非阻塞队列
+ConcurrentLinkedQueue，它是一种无界线程安全队列 (FIFO)，基于链表结构实现，利用 CAS 乐观锁来保证线程安全。
+```
+![storage](https://static001.geekbang.org/resource/image/59/da/59e1d01c8a60fe722aae01db86a913da.jpg)
 
 
