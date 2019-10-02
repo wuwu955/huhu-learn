@@ -225,4 +225,16 @@ ConcurrentLinkedQueue，它是一种无界线程安全队列 (FIFO)，基于链�
 ```
 ![storage](https://static001.geekbang.org/resource/image/59/da/59e1d01c8a60fe722aae01db86a913da.jpg)
 
+## 三 2019年10月2日 jvm 模块
+### 1 jvm 内存模型
+```pwd
+1 jdk 1.8 里主要是 分成了 堆（新生代【eden,s0,s1】,老年代，元空间），方法区，程序计数器，虚拟机栈，本地方法栈
+2 对象和共享变量放到堆里，类信息，方法和字符串常量池放到方法区里，栈里面都是内存地址值和局部变量
+3 本地方法栈——私有，存储线程的本地方法调用信息，也是主要是栈帧。是c 语言实现
+4 程序计数器——私有，记录线程的当前执行的位置信息。
+例如下图
+```
+![storage](https://static001.geekbang.org/resource/image/df/8b/dfd02c98d495c4c4ed201ea7fe0e3f8b.jpg)
+
+
 
