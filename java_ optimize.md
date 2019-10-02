@@ -267,5 +267,20 @@ ConcurrentLinkedQueue，它是一种无界线程安全队列 (FIFO)，基于链�
 ![storage](https://static001.geekbang.org/resource/image/3f/b9/3f4316c41d4ffb27e5a36db5f2641db9.jpg)
 ![storage](https://static001.geekbang.org/resource/image/28/74/2824581e7c94a3a94b2b0abb1d348974.jpg)
 
+### 3 内存溢出问题排查
+```pwd
+1 常用命令
+top 命令 查看当前系统 cpu，内存和系统负载情况
+top -Hp pid 查看具体线程使用系统资源情况 
+vmstat 命令 查看进程上下文切换次数 
+pidstat -p 1234 -r 1 3  -p 用于指定进程 ID，-r 表示监控内存的使用情况，1 表示每秒的意思，3 则表示采样次数。
+jstat -gc pid -t 查看内存 使用情况
+jstack pid 堆栈详细
+jmap -histo:live  pid 查看堆内存中的存活对象数目
+2 排查问题的相关资料
+https://mp.weixin.qq.com/s/ji_8NhN4NnEHrfAlA9X_ag
+https://mp.weixin.qq.com/s/IPi3xiordGh-zcSSRie6nA
+
+```
 
 
