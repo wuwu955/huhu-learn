@@ -236,5 +236,36 @@ ConcurrentLinkedQueue，它是一种无界线程安全队列 (FIFO)，基于链�
 ```
 ![storage](https://static001.geekbang.org/resource/image/df/8b/dfd02c98d495c4c4ed201ea7fe0e3f8b.jpg)
 
+### 2 jvm 垃圾回收分析和优化
+```pwd
+1. 回收发生在哪里？主要是 堆和方法区中的对象和废弃常量和无用的类
+2. 对象在什么时候可以被回收？引用计数和可达性分析算法
+3. 如何回收？GC 算法 标记清楚，标记整理，复制算法，分代收集 具体看下图
+4. jmap -heap pid 查看jvm 参数配置和使用情况
+5. jvm 性能几个指标 
+ 吞吐量：系统总运行时间 = 应用程序耗时 +GC 耗时。如果系统运行了 100 分钟，GC 耗时 1 分钟，则系统吞吐量为 99%。
+ 停顿时间：指垃圾收集器正在运行时，应用程序的暂停时间。对于串行回收器而言，停顿时间可能会比较长；并行时间停顿时间短但是吞吐量低
+ 垃圾回收频率：通常垃圾回收的频率越低越好，增大堆内存空间可以有效降低垃圾回收发生的频率
+6. 查看 & 分析 GC 日志 
+-XX:+PrintGCDateStamps -XX:+PrintGCDetails -Xloggc:./gclogs  //这里是以时间（日期形式）形式打出详细的GC的日志 输出到日志文件
+日志分析工具 https://sourceforge.net/projects/gcviewer/ https://www.gceasy.io/index.jsp
+7. GC 调优策略
+ 1. 降低 Minor GC 频率 
+ 通常情况下，由于新生代空间较小，Eden 区很快被填满，就会导致频繁 Minor GC，因此我们可以通过增大新生代空间来降低 Minor GC 的频率。
+ 2. 降低 Full GC 的频率 （堆内存空间不足或老年代对象太多，会触发 Full GC）
+ 减少大对象的创建 增大堆内存空间 选择合适的GC回收器
+8. 问题  minor gc是否会导致stop the world？ major gc什么时候会发生，它和full gc的区别是什么？
+ 1、不管什么GC，都会发送stop the world，区别是发生的时间长短。而这个时间跟垃圾收集器又有关系，Serial、PartNew、Parallel Scavenge收集器无论是串行还是并行，都会挂起用户线程，而CMS和G1在并发标记时，是不会挂起用户线程，但其他时候一样会挂起用户线程，stop the world的时间相对来说小很多了。
+ 2、major gc很多参考资料指的是等价于full gc，我们也可以发现很多性能监测工具中只有minor gc和full gc。
+一般情况下，一次full gc将会对年轻代、老年代以及元空间、堆外内存进行垃圾回收。而触发Full GC的原因有很多：
+ a、当年轻代晋升到老年代的对象大小比目前老年代剩余的空间大小还要大时，此时会触发Full GC；
+ b、当老年代的空间使用率超过某阈值时，此时会触发Full GC;
+ c、当元空间不足时（JDK1.7永久代不足），也会触发Full GC;
+ d、当调用System.gc()也会安排一次Full GC;
+
+```
+![storage](https://static001.geekbang.org/resource/image/3f/b9/3f4316c41d4ffb27e5a36db5f2641db9.jpg)
+![storage](https://static001.geekbang.org/resource/image/28/74/2824581e7c94a3a94b2b0abb1d348974.jpg)
+
 
 
