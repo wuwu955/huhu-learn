@@ -2,6 +2,8 @@
 #这里可替换为你自己的执行程序，其他代码无需更改
 APP_NAME=jxc-1.0.jar
 LOG_NAME=/home/app/ikeepParent/jxc/logs/jxc.log 
+# JAVA OPTIONS jvm 参数 这里可以配置调优项
+JAVA_OPTS=-Xms512M -Xmx512M
 #使用说明，用来提示输入参数
 usage() {
     echo "Usage: sh 执行脚本.sh [start|stop|restart|status]"
@@ -25,7 +27,7 @@ start(){
   if [ $? -eq "0" ]; then
     echo "${APP_NAME} is already running. pid=${pid} ."
   else
-    nohup java -jar -Xms524M -Xmx524M $APP_NAME >$LOG_NAME 2>&1 &
+    nohup java -jar $JAVA_OPTS $APP_NAME >$LOG_NAME 2>&1 &
   fi
 }
  
