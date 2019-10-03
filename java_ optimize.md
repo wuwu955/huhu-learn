@@ -282,5 +282,79 @@ https://mp.weixin.qq.com/s/ji_8NhN4NnEHrfAlA9X_ag
 https://mp.weixin.qq.com/s/IPi3xiordGh-zcSSRie6nA
 
 ```
+## 三 2019年10月3日 设计模式
+
+### 1 单例模式
+```pwd
+
+// 懒汉模式 + synchronized 同步锁 +volatile+ double-check
+public final class Singleton {
+    private volatile static Singleton instance= null;// 不实例化
+    public List<String> list = null;//list 属性
+    private Singleton(){
+      list = new ArrayList<String>();
+    }// 构造函数
+    public static Singleton getInstance(){// 加同步锁，通过该函数向整个系统提供实例
+        if(null == instance){// 第一次判断，当 instance 为 null 时，则实例化对象，否则直接返回对象
+          synchronized (Singleton.class){// 同步锁
+             if(null == instance){// 第二次判断
+                instance = new Singleton();// 实例化对象
+             }
+          } 
+        }
+        return instance;// 返回已存在的对象
+    }
+}
+1 static 修饰了成员变量 instance，在多线程的情况下能保证只实例化一次。
+2 volatile 关键字可以保证线程间变量的可见性，和能阻止局部重排序的发生。
+3 double-check 双重检查
+
+// 懒汉模式 内部类实现
+public final class Singleton {
+	public List<String> list = null;// list 属性
+
+	private Singleton() {// 构造函数
+		list = new ArrayList<String>();
+	}
+
+	// 内部类实现
+	public static class InnerSingleton {
+		private static Singleton instance=new Singleton();// 自行创建实例
+	}
+
+	public static Singleton getInstance() {
+		return InnerSingleton.instance;// 返回内部类中的静态变量
+	}
+}
+//枚举类
+public class SinletonExample {
+    private static SinletonExample instance = null;
+
+    // 私有构造函数
+    private SinletonExample(){
+    }
+
+    public static SinletonExample getInstance(){
+        return Sinleton.SINLETON.getInstance();
+    }
+
+    private enum Sinleton{
+        SINLETON;
+
+        private SinletonExample singleton;
+
+        // JVM保证这个方法只调用一次
+        Sinleton(){
+            singleton = new SinletonExample();
+        }
+
+        public SinletonExample getInstance(){
+            return singleton;
+        }
+    }
+}
+
+
+```
 
 
