@@ -403,4 +403,9 @@ for(int i=0; i<list.size(); i++){
 相对new来说，clone少了调用构造函数。如果构造函数中存在大量属性初始化或大对象，则使用clone的复制对象的方式性能会好一些。
  
 ```
+### 3 装饰器优化电商系统中的商品价格策略
+```pwd
 
+https://github.com/nickliuchao/decorator
+
+```
