@@ -354,7 +354,53 @@ public class SinletonExample {
     }
 }
 
-
 ```
+### 2 原型模式和享元模式
+```pwd
+1：原型模式——通过使用更高效的对象创建方式来创建大量重复对象，已提高创建对象的性能。
+// 学生类实现 Cloneable 接口
+class Student implements Cloneable{  
+    private String name;  // 姓名
+    public String getName() {  
+        return name;  
+    }  
+    public void setName(String name) {  
+        this.name= name;  
+    } 
+   // 重写 clone 方法
+   public Student clone() { 
+        Student student = null; 
+        try { 
+            student = (Student) super.clone(); 
+            } catch (CloneNotSupportedException e) { 
+            e.printStackTrace(); 
+            } 
+            return student; 
+   }   
+}
+//优化前
+for(int i=0; i<list.size(); i++){
+  Student stu = new Student(); 
+  ...
+}
+//优化后
+Student stu = new Student(); 
+for(int i=0; i<list.size(); i++){
+ Student stu1 = (Student)stu.clone();
+  ...
+}
 
+2：享员模式——通过减少内部公享数据的创建来创建对象，以提高创建对象的性能。例如 String 字符串常量池 减少创建相同值的对象，线程池
+3：new一个对象和clone一个对象，性能差在哪里呢？（这里主要是大对象和大数据量区创建对象的性能了）
+一个对象通过new创建的过程为：
+1、在内存中开辟一块空间；
+2、在开辟的内存空间中创建对象；
+3、调用对象的构造函数进行初始化对象。
+
+而一个对象通过clone创建的过程为：
+1、根据原对象内存大小开辟一块内存空间；
+2、复制已有对象，克隆对象中所有属性值。
+相对new来说，clone少了调用构造函数。如果构造函数中存在大量属性初始化或大对象，则使用clone的复制对象的方式性能会好一些。
+ 
+```
 
