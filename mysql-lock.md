@@ -162,6 +162,17 @@ update t set c=15 where id =15; -- 不锁
 BEGIN;
 update t set c =5 where id =15; --锁
 
+//死锁
+BEGIN;
+1 SELECT * from t WHERE id =32 for UPDATE;
+
+3 INSERT into t VALUES(32,32,32,32);
+
+
+BEGIN;
+
+2 SELECT * from t WHERE id =33 for UPDATE;
+INSERT into t VALUES(39,39,39,39);
 
 ```
 
@@ -169,6 +180,10 @@ update t set c =5 where id =15; --锁
 # 第1和第4为什么会阻塞 这是个问题？
 加锁范围是 索引c列（5.15）但是对应数据记录是id =5 到id =15的之间 也就是说 更新的值在这个区间的话要被阻塞
 根据 c 排序 1和4 都在 记录id =5 和id =15之间
+
+# 最后一个为什么并发执行出现死锁呢？
+插入的时候都是 （30，+∞） 需要相互等待释放间隙锁
+
 
 ```
 
@@ -284,16 +299,3 @@ InnoDB默认的隔离级别是RR，用得最多的隔离级别是RC,单纯在隔
 
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
