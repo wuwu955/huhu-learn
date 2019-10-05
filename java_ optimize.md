@@ -409,3 +409,74 @@ for(int i=0; i<list.size(); i++){
 https://github.com/nickliuchao/decorator
 
 ```
+
+## 四 2019年10月5日 设计模式
+
+### 1 分布式锁的设计
+```pwd
+redis 实现分布式锁
+
+    private static final String LOCK_SUCCESS = "OK";
+    private static final String SET_IF_NOT_EXIST = "NX";
+    private static final String SET_WITH_EXPIRE_TIME = "PX";
+
+    /**
+     * 尝试获取分布式锁
+     * @param jedis Redis 客户端
+     * @param lockKey 锁
+     * @param requestId 请求标识
+     * @param expireTime 超期时间
+     * @return 是否获取成功
+     */
+    public static boolean tryGetDistributedLock(Jedis jedis, String lockKey, String requestId, int expireTime) {
+
+        String result = jedis.set(lockKey, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);
+
+        if (LOCK_SUCCESS.equals(result)) {
+            return true;
+        }
+        return false;
+
+    }
+    
+ lua 脚本
+     // 加锁脚本
+    private static final String SCRIPT_LOCK = "if redis.call('setnx', KEYS[1], ARGV[1]) == 1 then redis.call('pexpire', KEYS[1], ARGV[2]) return 1 else return 0 end";
+    // 解锁脚本
+    private static final String SCRIPT_UNLOCK = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+
+Redisson 实现
+
+<dependency>
+      <groupId>org.redisson</groupId>
+      <artifactId>redisson</artifactId>
+      <version>3.8.2</version>
+</dependency>
+
+@Bean
+public RedissonClient redissonClient() {
+    Config config = new Config();
+    config.useClusterServers()
+            .setScanInterval(2000) // 集群状态扫描间隔时间，单位是毫秒
+            .addNodeAddress("redis://127.0.0.1:7000).setPassword("1")
+            .addNodeAddress("redis://127.0.0.1:7001").setPassword("1")
+            .addNodeAddress("redis://127.0.0.1:7002")
+            .setPassword("1");
+    return Redisson.create(config);
+}
+
+long waitTimeout = 10;
+long leaseTime = 1;
+RLock lock1 = redissonClient1.getLock("lock1");
+RLock lock2 = redissonClient2.getLock("lock2");
+RLock lock3 = redissonClient3.getLock("lock3");
+
+RedissonRedLock redLock = new RedissonRedLock(lock1, lock2, lock3);
+// 同时加锁：lock1 lock2 lock3
+// 红锁在大部分节点上加锁成功就算成功，且设置总超时时间以及单个节点超时时间
+redLock.trylock(waitTimeout,leaseTime,TimeUnit.SECONDS);
+...
+redLock.unlock();
+
+
+```
