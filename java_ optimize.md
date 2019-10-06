@@ -439,13 +439,14 @@ redis 实现分布式锁
 
     }
     
- lua 脚本
+ lua 脚本 实现锁的设置和过期时间的原子性
      // 加锁脚本
     private static final String SCRIPT_LOCK = "if redis.call('setnx', KEYS[1], ARGV[1]) == 1 then redis.call('pexpire', KEYS[1], ARGV[2]) return 1 else return 0 end";
     // 解锁脚本
     private static final String SCRIPT_UNLOCK = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
 
-Redisson 实现
+如果是在 Redis 集群环境下，依然存在问题。由于 Redis 集群数据同步到各个节点时是异步的，如果在 Master 节点获取到锁后，在没有同步到其它节点时，Master 节点崩溃了，此时新的 Master 节点依然可以获取锁，所以多个应用服务可以同时获取到锁。
+Redisson 实现 多个节点都上锁
 
 <dependency>
       <groupId>org.redisson</groupId>
