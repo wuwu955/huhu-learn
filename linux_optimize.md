@@ -80,4 +80,19 @@ http://note.youdao.com/noteshare?id=7f3c0445f1828c8cd2094de4b59a331b
 
 ```
 
+### 4 上下文切换排查
 
+```pwd
+过多上下文切换会缩短进程运行时间
+vmstat 1 1：分析内存使用情况、cpu上下文切换和中断的次数。cs每秒上下文切换的次数，in每秒中断的次数，r运行或等待cpu的进程数，b中断睡眠状态的进程数。
+pidstat -w 5：查看每个进程详细情况。cswch（每秒自愿）上下文切换次数，如系统资源不足导致，nvcswch每秒非自愿上下文切换次数，如cpu时间片用完或高优先级线程
+案例分析：
+sysbench：多线程的基准测试工具，模拟context switch
+终端1：sysbench --threads=10 --max-time=300 threads run
+终端2：vmstat 1：sys列占用84%说明主要被内核占用，ur占用16%；r就绪队列8；in中断处理1w，cs切换139w==>等待进程过多，频繁上下文切换，内核cpu占用率升高
+终端3：pidstat -w -u 1：sysbench的cpu占用100%（-wt发现子线程切换过多），其他进程导致上下文切换
+watch -d cat /proc/interupts ：查看另一个指标中断次数，在/proc/interupts中读取，发现重调度中断res变化速度最快
+总结：cswch过多说明资源IO问题，nvcswch过多说明调度争抢cpu过多，中断次数变多说明cpu被中断程序调用
+
+
+```
