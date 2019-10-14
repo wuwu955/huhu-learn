@@ -59,6 +59,7 @@ http://note.youdao.com/noteshare?id=7f3c0445f1828c8cd2094de4b59a331b
 iostat
 https://www.cnblogs.com/ftl1012/p/iostat.html
 https://www.jellythink.com/archives/438
+https://www.zybuluo.com/Gugoole/note/1354842
 ```
 ### 3 上下文切换
 
