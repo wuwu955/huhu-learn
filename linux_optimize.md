@@ -54,7 +54,11 @@ pidstat -u 5 1：观察那些%wait较高的进程是否有很多
 4 htop 看负载 cpu密集型的应用，它的负载颜色是绿色偏高，iowait的操作，它的负载颜色是红色偏高等等 atop 
 5 top和ps或者lsof来分析
 五 相关笔记
+http://www.brendangregg.com/blog/2017-08-08/linux-load-averages.html
 http://note.youdao.com/noteshare?id=7f3c0445f1828c8cd2094de4b59a331b
+iostat
+https://www.cnblogs.com/ftl1012/p/iostat.html
+https://www.jellythink.com/archives/438
 ```
 ### 3 上下文切换
 
