@@ -140,7 +140,7 @@ CPU使用率高 = 1 - 【空闲时间(new）- 空闲时间（old）】／【总C
      方法二：perf record 和 perf report。可用于离线分析
 4 工具查看
 1： 对于pidstat,vmstat,top无法定位到问题的时候。
-2： 可以选择perf record -g 记录。
+2： 可以选择perf record -g 记录。perf record -ag -- sleep 2
 3： 用perf report查看是否可以定位到问题。
 4： 用pstree | grep [xx],这样定位到具体的调用方法里。
 5： 用grep [xx] -r [项目文件],找到具体代码位置。
