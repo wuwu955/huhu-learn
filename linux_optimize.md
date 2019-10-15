@@ -99,5 +99,44 @@ sysbench：多线程的基准测试工具，模拟context switch
 watch -d cat /proc/interupts ：查看另一个指标中断次数，在/proc/interupts中读取，发现重调度中断res变化速度最快
 总结：cswch过多说明资源IO问题，nvcswch过多说明调度争抢cpu过多，中断次数变多说明cpu被中断程序调用
 
+```
+
+
+### 5 cpu% 排查
+
+```pwd
+用户空间节拍率( USER_HZ)是一个固定设置
+[root@dbayang ~]# grep 'CONFIG_HZ=' /boot/config-$(uname -r)
+CONFIG_HZ=1000
+
+1. CPU使用率怎么计算的？
+    前面讲过CPU使用率是单位时间内CPU使用情况的统计，如果我们只关注系统的CPU和任务统计信息，可以通过／proc/stat来统计，但是反应的是开机时间以来平均CPU使用率，没有意义
+ CPU使用率常见的重要指标有：         
+user（us）
+用户态CPU的时间，注意不包括nice时间
+nice（ni）
+低优先级用户态CPU时间
+system（sys）
+内核态CPU时间
+idle（id）
+空闲时间，不包括等待I/O的时间（iowait）
+iowait（wa）
+等待I/O的CPU时间
+irq（hi）
+硬中断的CPU时间
+softirq（si）
+处理软中断的CPU时间
+CPU 使用率，就是除了空闲时间外的其他时间占总 CPU 时间的百分比
+CPU使用率 = 1 - （空闲时间）／ （总CPU时间）
+但是实时CPU使用率都是通过以下公式计算的：
+CPU使用率高 = 1 - 【空闲时间(new）- 空闲时间（old）】／【总CPU时间（new）- 总CPU时间（old）】
+2. 如何查看CPU使用率
+   top 显示了系统总体的 CPU 和内存使用情况，以及各个进程的资源使用情况
+   Ps 则只显示了每个进程的资源使用情况
+   mpstat -P ALL 
+
+3. CPU使用率过高怎么办？
+     方法一：Perf top，它能够实时显示占用 CPU 时钟最多的函数或者指令，因此可以查找热点函数
+     方法二：perf record 和 perf report。可用于离线分析
 
 ```
