@@ -138,5 +138,12 @@ CPU使用率高 = 1 - 【空闲时间(new）- 空闲时间（old）】／【总C
 3. CPU使用率过高怎么办？
      方法一：Perf top，它能够实时显示占用 CPU 时钟最多的函数或者指令，因此可以查找热点函数
      方法二：perf record 和 perf report。可用于离线分析
-
+4 工具查看
+1： 对于pidstat,vmstat,top无法定位到问题的时候。
+2： 可以选择perf record -g 记录。
+3： 用perf report查看是否可以定位到问题。
+4： 用pstree | grep [xx],这样定位到具体的调用方法里。
+5： 用grep [xx] -r [项目文件],找到具体代码位置。
+6： 查找源码，定位到具体位置，修改。
+https://github.com/brendangregg/perf-tools
 ```
