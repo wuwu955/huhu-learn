@@ -170,5 +170,29 @@ T:暂停 Stopped或Traced的缩写，表示进程处于暂停或者跟踪状态
 4、实操
 （1）查看了僵尸进程 查看僵尸进程的命令 ps -e -o stat,ppid,pid,cmd | egrep '^[Zz]' 或 ps -ef | grep "defunct"，停止父进程后，僵尸进程会被回收
 
-
 ```
+### 7 出现大量僵尸进程
+
+```pwd
+
+现象：
+①iowait太高，导致平均负载升高，并且达到了系统CPU的个数
+②僵尸进程不断增多
+分析过程：
+1.先分析iowait升高的原因
+一般iowait升高，可能的原因是i/o问题
+①用dstat 命令同时查看cpu和i/o对比情况（如 dstat 1 10 间隔1秒输出10组数据），通过结果可以发现iowait升高时，磁盘读请求（read）升高
+所以推断iowait升高是磁盘读导致
+②定位磁盘读的进程，使用top命令查看处于不可中断状态（D）的进程PID
+③查看对应进程的磁盘读写情况，使用pidstat命令，加上-d参数，可以看到i/o使用情况（如 pidstat -d -p <pid> 1 3）,发现处于不可中断状态的进程都没有进行磁盘读写
+④继续使用pidstat命令，但是去掉进程号，查看所有进程的i/o情况（pidstat -d 1 20），可以定位到进行磁盘读写的进程。我们知道进程访问磁盘，需要使用系统调用，
+下面的重点就是找到该进程的系统调用
+⑤使用strace查看进程的系统调用 strace -p <pid>
+发现报了 strace:attach :ptrace(PTRACE_SIZE，6028)：Operation not peritted,说没有权限，我是使用的root权限，所以这个时候就要查看进程的状态是否正常
+⑥ps aux | grep <pid> 发现进程处于Z状态，已经变成了僵尸进程，所以不能进行系统调用分析了
+⑦既然top和pidstat都不能找出问题，使用基于事件记录的动态追踪工具
+
+这里看top 就可以看到了 s  栏出现很多z 状态的进程 task 里 z 数目很多 其实先 top  看进程 然后 pidstat -d 查看进程使用资源使用情况
+然后 找到 读写很大的进程 strace 跟踪 或者 ps aux | grep pid 查看进程状态 如果是z 那么要找到父进程 pstree - pid
+```
+
