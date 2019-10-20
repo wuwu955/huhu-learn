@@ -242,3 +242,15 @@ $ tcpdump -i eth0 -n tcp port 80
 3.查看网络状态， netstat -s 或者 watch -d netstat -s
 4.网络状态的统计 ss -ant | awk '{++s[$1]} END {for(k in s) print k,s[k]}'
 ```
+### 10 分析流程和命令
+```pwd
+pidstat 中， %wait 表示进程等待 CPU 的时间百分比。此时进程是运行状态。
+top 中 ，iowait% 则表示等待 I/O 的 CPU 时间百分比。此时进程处于不可中断睡眠态。
+等待 CPU 的进程已经在 CPU 的就绪队列中，处于运行状态；而等待 I/O 的进程则处于不可中断状态。
+
+```
+![ cpu](https://static001.geekbang.org/resource/image/7a/17/7a445960a4bc0a58a02e1bc75648aa17.png)
+![ cpu](https://static001.geekbang.org/resource/image/b0/ca/b0c67a7196f5ca4cc58f14f959a364ca.png)
+
+
+
