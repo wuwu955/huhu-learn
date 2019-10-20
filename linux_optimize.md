@@ -249,8 +249,8 @@ top 中 ，iowait% 则表示等待 I/O 的 CPU 时间百分比。此时进程处
 等待 CPU 的进程已经在 CPU 的就绪队列中，处于运行状态；而等待 I/O 的进程则处于不可中断状态。
 
 ```
-![ cpu](https://static001.geekbang.org/resource/image/7a/17/7a445960a4bc0a58a02e1bc75648aa17.png?w=1034&h=198&f=png&s=47686)
-![ cpu](https://static001.geekbang.org/resource/image/b0/ca/b0c67a7196f5ca4cc58f14f959a364ca.png?w=1034&h=198&f=png&s=47686)
+![ cpu](https://static001.geekbang.org/resource/image/7a/17/7a445960a4bc0a58a02e1bc75648aa17.png)
+![ cpu](https://static001.geekbang.org/resource/image/b0/ca/b0c67a7196f5ca4cc58f14f959a364ca.png)
 
 
 
