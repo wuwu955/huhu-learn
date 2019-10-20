@@ -102,7 +102,7 @@ watch -d cat /proc/interupts ：查看另一个指标中断次数，在/proc/int
 ```
 
 
-### 5 cpu% 排查
+### 5 cpu 分析
 
 ```pwd
 用户空间节拍率( USER_HZ)是一个固定设置
@@ -196,3 +196,49 @@ T:暂停 Stopped或Traced的缩写，表示进程处于暂停或者跟踪状态
 然后 找到 读写很大的进程 strace 跟踪 或者 ps aux | grep pid 查看进程状态 如果是z 那么要找到父进程 pstree - pid
 ```
 
+### 8 系统软中断排查思路
+
+```pwd
+什么是软中断?
+ 硬中断是硬件产生的,比如键盘、鼠标的输入，硬盘的写入读取、网卡有数据了；软中断是软件产生的，比如程序内的定时器、[文中提到的RCU锁]。
+ 网卡的处理实际是有硬中断和软中断的。
+问题:有没有碰到过因为软中断出现的性能问题?
+通过vmstat 检测到系统的软中断每秒有100W+次.
+分析
+1.检测是哪个线程占用了cpu: top -H -p XX 1 / pidstat -wut -p XX 1
+2.在进程中打印各线程号. 找到是哪个线程.[ 此过程也可以省略 但可以快速定位线程]
+3.第一步应该可以判断出来中断数过高. 再使用 cat /proc/softirqs 查看是哪种类型的中断数过高.  cat /proc/interrupts 硬中断
+NET_RX 表示网络接收中断，而 NET_TX 表示网络发送中断。
+
+```
+### 9 系统的软中断CPU使用率升高
+
+```pwd
+步骤
+top 看到 负载和cpu 都不高  但是主要的cpu 都在 si(软中断上) 性能慢
+watch -d cat /proc/softirqs 查看是哪种类型的中断数过高 TIMER（定时中断）、NET_RX（网络接收）、SCHED（内核调度）、RCU（RCU 锁）
+看到 NET_RX 发生变化 就用 sar 工具 网络报告
+# -n DEV 表示显示网络收发的报告，间隔 1 秒输出一组数据
+$ sar -n DEV 1
+15:03:46        IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+15:03:47         eth0  12607.00   6304.00    664.86    358.11      0.00      0.00      0.00      0.01
+15:03:47      docker0   6302.00  12604.00    270.79    664.66      0.00      0.00      0.00      0.00
+15:03:47           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+15:03:47    veth9f6bbcd   6302.00  12604.00    356.95    664.66      0.00      0.00      0.00      0.05
+第二列：IFACE 表示网卡。第三、四列：rxpck/s 和 txpck/s 分别表示每秒接收、发送的网络帧数，也就是  PPS。第五、六列：rxkB/s 和 txkB/s 分别表示每秒接收、发送的千字节数，也就是  BPS。
+
+从中看到 eth0 接收数据比较大 但是发送比较少 说明接收中断了
+然后 抓包 tcpdump
+# -i eth0 只抓取 eth0 网卡，-n 不解析协议名和主机名
+# tcp port 80 表示只抓取 tcp 协议并且端口号为 80 的网络帧
+$ tcpdump -i eth0 -n tcp port 80
+15:11:32.678966 IP 192.168.0.2.18238 > 192.168.0.30.80: Flags [S], seq 458303614, win 512, length 0
+看到是 Flags [S] 就证明是SYN 包 接收中断了
+
+其他
+找网络相关的错误，可以有几种方式。
+1. 找系统类的错误， dmesg | tail
+2. 直接的网络错误 sar -n ETCP 1 或者 sar -n EDEV 1
+3.查看网络状态， netstat -s 或者 watch -d netstat -s
+4.网络状态的统计 ss -ant | awk '{++s[$1]} END {for(k in s) print k,s[k]}'
+```
