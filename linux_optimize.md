@@ -253,7 +253,7 @@ top 中 ，iowait% 则表示等待 I/O 的 CPU 时间百分比。此时进程处
 ![ cpu](https://static001.geekbang.org/resource/image/b0/ca/b0c67a7196f5ca4cc58f14f959a364ca.png)
 
 
-## 一 2019年10月21日 内存性能篇
+## 二 2019年10月21日 内存性能篇
 
 ### 1 linux 内存分配
 ```pwd
