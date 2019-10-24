@@ -276,6 +276,15 @@ cache是针对文件系统的缓存 ，而buffers是对磁盘数据的缓存，�
 其实 Linux 中“一切皆文件”，而文章中提到的“文件”是普通文件，磁盘是块设备文件，这些大家可以执行 "ls -l <路径>" 查看它们的区别（输出的含义如果不懂请 man ls 查询）。
 在读写普通文件时，会经过文件系统，由文件系统负责与磁盘交互；而读写磁盘或者分区时，就会跳过文件系统，也就是所谓的“裸I/O“。这两种读写方式所使用的缓存是不同的，也就是文中所讲的 Cache 和 Buffer 区别。
 
+shell 脚本 取内存占用top10的进程 但是有重复计算的情况 RSS 表示常驻内存，把进程用到的共享内存也算了进去。所以，直接累加会导致共享内存被重复计算
+for i in $( ls /proc/ |grep "^[0-9]"|awk '$0 >100') ;do cmd="";[ -f /proc/$i/cmdline ] && cmd=`cat /proc/$i/cmdline`;[ "$cmd"X = ""X ] && cmd=$i;awk -v i="$cmd" '/Rss:/{a=a+$2}END{printf("%s:%d\n",i,a)}' /proc/$i/smaps 2>/dev/null; done | sort -t: -k2nr | head -10
+
+内存统计 使用grep查找Pss指标后，再用awk计算累加值 
+$ grep Pss /proc/[1-9]*/smaps | awk '{total+=$2}; END {printf "%d kB\n", total }'
+391266 kB
+
+smem|awk '{total+=$7};END{printf "%d kb/n",total}'
+
 ```
 ### 2 linux swap 区
 ```pwd
@@ -292,3 +301,52 @@ numa感觉是对系统资源做的隔离分区,不过目前虚拟化和docker这
 sar -h --human -r -S 1 5
 
 ```
+### 3 内存分析流程
+![ m](https://static001.geekbang.org/resource/image/d7/fe/d79cd017f0c90b84a36e70a3c5dccffe.png)
+
+### 3 CentOS 安装 bcc-tools 
+``` pwd
+1 相关文档 主要是cachestat cachetop 工具
+https://github.com/iovisor/bcc/issues/462
+https://www.jianshu.com/p/997e0a6d8e09
+# 升级系统
+yum update -y
+
+# 安装ELRepo
+rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+rpm -Uvh https://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+
+# 安装新内核
+yum remove -y kernel-headers kernel-tools kernel-tools-libs
+yum --enablerepo="elrepo-kernel" install -y kernel-ml kernel-ml-devel kernel-ml-headers kernel-ml-tools kernel-ml-tools-libs kernel-ml-tools-libs-devel
+
+# 更新Grub后重启
+grub2-mkconfig -o /boot/grub2/grub.cfg
+grub2-set-default 0
+reboot
+
+# 重启后确认内核版本已升级为4.20.0-1.el7.elrepo.x86_64
+uname -r
+
+
+
+# 安装bcc-tools
+yum install -y bcc-tools
+
+# 配置PATH路径
+export PATH=$PATH:/usr/share/bcc/tools
+
+# 验证安装成功
+cachestat 
+
+其他 人经历
+我的系统centos7.3更新了之后内核是5.0.5版本的，升完之后一直提示缺少库文件，我的做法是
+rpm -qa |grep kerner,先查找系统内核版本，网上查找相应的匹配kerner-devel包，及时没有相同版本也不要紧，比如5.0.5-1的版本就是我系统的版本网上找了没有这个版本对应的kerner-devel包但是不知道为什么升级了会安装这个版本，我系统升级前centos7.3，升级后7.6。我就下载了5.0.5-3并安装，然后版本的，找到对应的包版本，rpm -ql 包版本，做个软连接就OK。至此bcc已经安装完成。做为一个linux运维我都装了2天，可想而知大家。此方法亲测centos7.3
+在这里 http://mirror.rc.usf.edu/compute_lock/elrepo/kernel/el7/x86_64/RPMS/找一个 4.1-4.20 的内核版本安装就好了，5.0 的会有 bug https://github.com/iovisor/bcc/issues/2329
+
+bcc-tools install(centos6.9) 已尝试可以顺利安装
+https://blog.csdn.net/luckgl/article/details/88355074
+
+```
+
+
