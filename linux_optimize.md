@@ -304,7 +304,7 @@ sar -h --human -r -S 1 5
 ### 3 内存分析流程
 ![ m](https://static001.geekbang.org/resource/image/d7/fe/d79cd017f0c90b84a36e70a3c5dccffe.png)
 
-### 3 CentOS 安装 bcc-tools 
+### 4 CentOS 安装 bcc-tools 
 ``` pwd
 1 相关文档 主要是cachestat cachetop 工具
 https://github.com/iovisor/bcc/issues/462
