@@ -348,5 +348,32 @@ bcc-tools install(centos6.9) 已尝试可以顺利安装
 https://blog.csdn.net/luckgl/article/details/88355074
 
 ```
+## 三 2019年10月26日 IO性能篇
+### 1 文件系统
+```pwd
+查看 文件系统容量
+$ df -h /dev/sda1 
+Filesystem      Size  Used Avail Use% Mounted on 
+/dev/sda1        29G  3.1G   26G  11% / 
+统计索引节点 df -i  df -h显示还有很多空间，可就是无法创建文件了。
+$ df -i /dev/sda1 
+Filesystem      Inodes  IUsed   IFree IUse% Mounted on 
+/dev/sda1      3870720 157460 3713260    5% / 
+查看页面cache 大小
+$ cat /proc/meminfo | grep -E "SReclaimable|Cached" 
+Cached:           748316 kB 
+SwapCached:            0 kB 
+SReclaimable:     179508 kB 
+# 按下c按照缓存大小排序，按下a按照活跃对象数排序 
+$ slabtop
+
+```
+### 2 磁盘IO
+```pwd
+io 问题分析
+1.用iostat看磁盘的await，utils，iops，bandwidth
+2.用smartctl看磁盘的health status
+3.用iotop/pidstat找出持续读写的进程做优化
+```
 
 
