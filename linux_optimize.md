@@ -371,9 +371,16 @@ $ slabtop
 ### 2 磁盘IO
 ```pwd
 io 问题分析
-1.用iostat看磁盘的await，utils，iops，bandwidth
+先是top看%iowait到升高，再看pidstat是哪个进程在操作磁盘(kB_ccwr)写次数，再strace看进程的调用栈。
+1.用iostat看磁盘的await（响应时间），utils（使用率）， aqu-sz （等待队列），iops，bandwidth （iostat -d -x 1）
 2.用smartctl看磁盘的health status
-3.用iotop/pidstat找出持续读写的进程做优化
+3.用iotop/pidstat找出持续读写的进程做优化（pidstat -d 1）
+4.看进程是否写文件 strace -p 12280 2>&1 | grep write 
+5.其他命宁
+strace -fp pid  跟踪所有线程。
+pidstat -wut 1 既可以看上下文切换 又可以看cpu使用统计 还可以看各线程.
+strace -p 3387 -f 2>&1 | grep write 可以追逐子线程
+可以用pstree -p 查看Python的进程树，然后strace -p 线程号，不过本例中线程消失非常快，需要写个脚本才行 比如：Python进程号是13205 strace -p `pstree -p 13205 | tail -n 1 | awk -F '(' '{print $NF}' | awk -F ')' '{print $1}'
 ```
 
 
