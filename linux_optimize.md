@@ -383,4 +383,53 @@ strace -p 3387 -f 2>&1 | grep write 可以追逐子线程
 可以用pstree -p 查看Python的进程树，然后strace -p 线程号，不过本例中线程消失非常快，需要写个脚本才行 比如：Python进程号是13205 strace -p `pstree -p 13205 | tail -n 1 | awk -F '(' '{print $NF}' | awk -F ')' '{print $1}'
 ```
 
+### 3 从io看sql响应时间慢的过程
+```pwd
+1 top 命宁看到 系统等待时间超过60% 说明存在io 等待
+$ top
+top - 12:02:15 up 6 days,  8:05,  1 user,  load average: 0.66, 0.72, 0.59
+Tasks: 137 total,   1 running,  81 sleeping,   0 stopped,   0 zombie
+%Cpu0  :  0.7 us,  1.3 sy,  0.0 ni, 35.9 id, 62.1 wa,  0.0 hi,  0.0 si,  0.0 st
+%Cpu1  :  0.3 us,  0.7 sy,  0.0 ni, 84.7 id, 14.3 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  8169300 total,  7238472 free,   546132 used,   384696 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.  7316952 avail Mem
+PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+27458 999       20   0  833852  57968  13176 S   1.7  0.7   0:12.40 mysqld
+
+2 iostat 命宁看到 读32M每秒 而且io使用率达到了97% 磁盘 sda 的读取确实碰到了性能瓶颈。
+$ iostat -d -x 1
+Device            r/s     w/s     rkB/s     wkB/s   rrqm/s   wrqm/s  %rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
+sda            273.00    0.00  32568.00      0.00     0.00     0.00   0.00   0.00    7.90    0.00   1.16   119.30     0.00   3.56  97.20
+
+3 pidstat 命宁看到 mysql的进程 符合上面的分析 每秒大概32m的读数据，说明是mysql 的问题
+# -d选项表示展示进程的I/O情况
+$ pidstat -d 1
+12:04:11      UID       PID   kB_rd/s   kB_wr/s kB_ccwr/s iodelay  Command
+12:04:12      999     27458  32640.00      0.00      0.00       0  mysqld
+12:04:12        0     27617      4.00      4.00      0.00       3  python
+12:04:12        0     27864      0.00      4.00      0.00       0  systemd-journal
+
+4 strace /lsof 查看进程打开的文件
+$ strace -f -p 27458
+[pid 28014] read(38, "934EiwT363aak7VtqF1mHGa4LL4Dhbks"..., 131072) = 131072
+[pid 28014] read(38, "hSs7KBDepBqA6m4ce6i6iUfFTeG9Ot9z"..., 20480) = 20480
+[pid 28014] read(38, "NRhRjCSsLLBjTfdqiBRLvN9K6FRfqqLm"..., 131072) = 131072
+
+lsof -p 27458
+COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+​mysqld  27458      999   38u   REG    8,1 512440000 2601895 /var/lib/mysql/test/products.MYD
+
+5 然后上面的已经说明了 mysql 一直在打开 那个文件 在用 show full processlist; 查看响应时间慢的sql 然后看sql 执行计划和表结构和索引情况
+
+mysql> show full processlist;
++----+------+-----------------+------+---------+------+--------------+-----------------------------------------------------+
+| Id | User | Host            | db   | Command | Time | State        | Info                                                |
++----+------+-----------------+------+---------+------+--------------+-----------------------------------------------------+
+| 27 | root | localhost       | test | Query   |    0 | init         | show full processlist                               |
+| 28 | root | 127.0.0.1:42262 | test | Query   |    1 | Sending data | select * from products where productName='geektime' |
++----+------+-----------------+------+---------+------+--------------+-----------------------------------------------------+
+2 rows in set (0.00 sec)
+
+
+```
 
