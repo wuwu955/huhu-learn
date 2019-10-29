@@ -215,8 +215,8 @@ https://mp.weixin.qq.com/s/H_2hyEqQ70Y_OoFZh_P_5A
 （3）业务折衷；
 
 https://mp.weixin.qq.com/s/WSocbTKWYBqOSfimdfm_JA
-
-
+秒杀相关设计 其他资料
+https://github.com/qiurunze123/miaosha
 ```
 
 
