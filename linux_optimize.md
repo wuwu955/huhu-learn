@@ -430,6 +430,20 @@ mysql> show full processlist;
 +----+------+-----------------+------+---------+------+--------------+-----------------------------------------------------+
 2 rows in set (0.00 sec)
 
+```
+### 4 linux开启端口号
+```pwd
+首先打开系统配置设置
+vim /etc/sysconfig/iptables
+添加端口开启
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 端口号 -j ACCEPT
+例如
+-A INPUT -s 203.100.87.24/32 -p tcp -m tcp --dport 9184 -j ACCEPT
+重启服务
+service iptables restart
+查看端口号开启情况
+/sbin/iptables -L -n
 
+netstat -anp|grep xx
 ```
 
