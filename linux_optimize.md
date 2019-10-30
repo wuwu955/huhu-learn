@@ -250,8 +250,6 @@ top 中 ，iowait% 则表示等待 I/O 的 CPU 时间百分比。此时进程处
 
 ```
 ![ cpu](https://static001.geekbang.org/resource/image/7a/17/7a445960a4bc0a58a02e1bc75648aa17.png)
-![ cpu](https://static001.geekbang.org/resource/image/b0/ca/b0c67a7196f5ca4cc58f14f959a364ca.png)
-
 
 ## 二 2019年10月21日 内存性能篇
 
@@ -381,6 +379,21 @@ strace -fp pid  跟踪所有线程。
 pidstat -wut 1 既可以看上下文切换 又可以看cpu使用统计 还可以看各线程.
 strace -p 3387 -f 2>&1 | grep write 可以追逐子线程
 可以用pstree -p 查看Python的进程树，然后strace -p 线程号，不过本例中线程消失非常快，需要写个脚本才行 比如：Python进程号是13205 strace -p `pstree -p 13205 | tail -n 1 | awk -F '(' '{print $NF}' | awk -F ')' '{print $1}'
+
+其他
+1.用top查看指标,发现 [系统] 有i/o瓶颈 或者 cpu瓶颈.
+2.使用iostat辅助看下磁盘i/o读写速度和大小等指标.
+3.用pidstat判断是哪个 [进程] 导致的. 既可以看进程各线程的cpu中断数,也可以看磁盘io数.
+4.用strace追踪进程及各线程的 [系统调用].(以前经常到这里就知道了是操作的什么文件)
+5.继续用lsof查看该进程打开的 [文件] .linux下一切皆文件,则可以查看的东西就很多很多了.连进程保持的socket等信息也一目了然.
+6.本例因为用到了容器,所以用到了nsenter进入容器的网络命名空间,查看对应的socket信息.
+7.根据第4.5步获取的信息,找源码或看系统配置.确定问题,做出调整.然后收工.
+
+其他人遇到问题
+数据写es，运行一段时间后，发现写入很慢，查io时发现，读的io很高，写的io很少，很奇怪只写数据还没查询，读的io使用率基本接近100%。
+用iotop定位到es一些写的线程，将线程id转成16进制，用jstack打印出es的堆栈信息，查出16进制的线程号的堆栈。发现原来是es会跟据doc id查数据，然后选择更新或新插入。es数据量大时，会占用了很多读的io.
+后面写es就不传id，让es自动生成。解决了问题。
+
 ```
 
 ### 3 从io看sql响应时间慢的过程
@@ -417,7 +430,7 @@ $ strace -f -p 27458
 
 lsof -p 27458
 COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
-​mysqld  27458      999   38u   REG    8,1 512440000 2601895 /var/lib/mysql/test/products.MYD
+mysqld  27458      999   38u   REG    8,1 512440000 2601895 /var/lib/mysql/test/products.MYD
 
 5 然后上面的已经说明了 mysql 一直在打开 那个文件 在用 show full processlist; 查看响应时间慢的sql 然后看sql 执行计划和表结构和索引情况
 
@@ -446,4 +459,20 @@ service iptables restart
 
 netstat -anp|grep xx
 ```
+
+### 5 为什么top显示 iowait比较高，但是使用iostat却发现io的使用率并不高那？
+```pwd
+ iowait不代表磁盘I/O存在瓶颈，只是代表CPU上I/O操作的时间占用的百分比。假如这时候没有其他进程在运行，那么很小的I/O就会导致iowait升高
+ %iowait 表示在一个采样周期内有百分之几的时间属于以下情况：CPU空闲、并且有仍未完成的I/O请求。
+对 %iowait 常见的误解有两个：
+　　一是误以为 %iowait 表示CPU不能工作的时间，
+　　二是误以为 %iowait 表示I/O有瓶颈。
+首先 %iowait 升高并不能证明等待I/O的进程数量增多了，也不能证明等待I/O的总时间增加了。
+　　例如，在CPU繁忙期间发生的I/O，无论IO是多还是少，%iowait都不会变；当CPU繁忙程度下降时，有一部分IO落入CPU空闲时间段内，导致%iowait升高。
+　　再比如，IO的并发度低，%iowait就高；IO的并发度高，%iowait可能就比较低。
+可见%iowait是一个非常模糊的指标，如果看到 %iowait 升高，还需检查I/O量有没有明显增加，avserv/avwait/avque等指标有没有明显增大，应用有没有感觉变慢，如果都没有，就没什么好担心的
+```
+### 6 io问题分析流程
+![ m](https://static001.geekbang.org/resource/image/18/8a/1802a35475ee2755fb45aec55ed2d98a.png)
+
 
