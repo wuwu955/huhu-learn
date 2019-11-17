@@ -476,3 +476,20 @@ netstat -anp|grep xx
 ![ m](https://static001.geekbang.org/resource/image/18/8a/1802a35475ee2755fb45aec55ed2d98a.png)
 
 
+## 四 2019年11月17日 网络 性能篇
+
+### 1 TCP/IP 模型网络模型
+```pwd
+应用层，负责向用户提供一组应用程序，比如 HTTP、FTP、DNS 等。
+传输层，负责端到端的通信，比如 TCP、UDP 等。
+网络层，负责网络包的封装、寻址和路由，比如 IP、ICMP 等。
+网络接口层，负责网络包在物理网络中的传输，比如 MAC 寻址、错误侦测以及通过网卡传输网络帧等。
+
+在进行网络传输时，数据包就会按照协议栈，对上一层发来的数据进行逐层处理；然后封装上该层的协议头，再发送给下一层。
+tcpdump 和 Wireshark 就是最常用的网络抓包和分析工具，更是分析网络性能必不可少的利器
+wireshark的使用推荐阅读林沛满的《Wireshark网络分析就这么简单》和《Wireshark网络分析的艺术》
+```
+### 2 TCP 优化
+![ m](https://static001.geekbang.org/resource/image/b0/e0/b07ea76a8737ed93395736795ede44e0.png)
+
+
