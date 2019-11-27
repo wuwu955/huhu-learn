@@ -1,0 +1,133 @@
+#maven 打包本地jar包到仓库
+mvn install:install-file -Dfile="C:\Users\lswuzhou\Documents\Tencent Files\756097102\FileRecv\mamb-mr-api-2.0.0.jar" -DgroupId=com.ls.mamb.mr -DartifactId=mamb-mr-api -Dversion=2.0.0 -Dpackaging=jar
+#大学 
+课程账号 18086526085 密码 654321
+#查看项目进程
+jps -l 显示jar包名称
+ps-ef|grep xx 进程详细运行时间
+#查看cpu使用情况  #打印pid的16进制
+top -c 
+top -Hp pid(项目pid)       printf '%x\n' pid(cpu高的pid)
+#查看线程定位代码 
+jstack pid(项目pid) | grep [16]
+#查看哪些进程打开了端口(根据端口找进程)
+lsof -i:6480
+ps -ef| grep 6480 
+#根据进程找端口(互看) 端口号是否被占用
+netstat -nap | grep pid(端口)
+netstat -anp|grep 20880
+
+tcp6       0      0 :::6480(端口)                :::*                    LISTEN      4000/java (监听进程)  
+#进程和端口关系
+一个进程可以监听多个端口,一个端口只能被一个进程监听
+#查看日志翻页
+使用more和less命令, 如: cat -n test.log |grep "地形" |more     这样就分页打印了,通过点击空格键翻页
+#查询时间段的日志 并分页
+sed -n '/2018-10-17 15:52:22:353/,/2018-10-17 16:52:22:353/p' dubbo-access-consumer.2017-03-08.log | grep countOrgOrderc | more
+sed -n '/2018-12-18 15:56:22.*/,/2018-12-18 15:56:25.*/p' portalPro.log |more
+
+#查看jar 包里类路径
+jar tf  mamb-ac-api-2.0.0.jar |grep IMrInterfaceService
+com/ls/mamb/ac/api/service/mrInterface/IMrInterfaceService.class
+#查看死锁进程  然后 jstack - pid 定位分析
+jps -l delock   jstack -l pid
+#idea 
+Ctrl+Alt+left/right，返回至上次浏览的位置
+#查看jvm当前的heap dump的.
+jmap -heap pid   
+jmap -dump:format=b,file=文件名 [pid]
+#查看gc 内存分区
+jstat -gc pid timea(间隔时间ms) count(总条数)
+jstat -gc 29122 500 20
+#lombok @RequiredArgsConstructor 构造注入bean
+#查询线程数
+pstree -p | wc -l
+ps -eLf | wc -l
+#从已经备份好的日志中查询数据
+bzcat suyun.2017-06-26.log.bz2 | grep '1.2.3.4' | wc -l(统计字符行数)
+#备份服务 排除日志文件
+tar -zcvf /opt/backup/shenjian.tar.gz \ -exclude /opt/web/suyun_web/logs \ /opt/web/suyun_web
+#找到日志大于1g 的文件 第二步释放磁盘空间
+locate 
+find / -type f -size +60M (1G)
+find / -name '*log*' -size +1000M -exec du -h {} \;
+echo "">a.log
+#磁盘IO异常排查
+iotop -o 
+
+#赋权文件夹下的所有文件
+chmod -R 777 lib/
+#删除文件夹下的所有文件
+rm -rf *
+#项目依赖lib包
+mvn dependency:copy-dependencies -DoutputDirectory=lib
+#后台启动 日志重定向指定文件 
+nohup java -jar bookkeeping-1.0-SNAPSHOT.jar >/home/app/ikeepParent/bookkeeping/logs/bookkeeping.log 2>&1 &
+nohup java -jar portalsPro-1.0-SNAPSHOT.jar >/home/app/ikeepParent/portalsPro/logs/portalPro.log 2>&1 &
+nohup java -jar operation-1.0-SNAPSHOT.jar >/home/app/ikeepParent/operation/logs/operation.log 2>&1 &
+----------------------------
+nohup java -jar -Xms512m -Xmx1024m idServer-1.0-SNAPSHOT.jar >/home/app/ikeepParent/idServer/logs/idServer.log 2>&1 &
+nohup java -jar -Xms512m -Xmx1024m oauthServer-1.0-SNAPSHOT.jar >/home/app/ikeepParent/oauthServer/logs/oauth.log 2>&1 &
+tomcat-gateway 端口号8013
+
+nohup java -jar -Xms512m -Xmx1024m portalsPro-1.0-SNAPSHOT.jar >/home/app/ikeepParent/portalsPro/logs/portalPro.log 2>&1 &
+
+nohup java -jar -Xms512m -Xmx1024m operation-1.0-SNAPSHOT.jar >/home/app/ikeepParent/operation/logs/operation.log 2>&1 &
+
+nohup java -jar -Xms512m -Xmx1024m jxc-1.0.jar  >/home/app/tomcat-cloud/tomcat-8019-jxc/logs/jxc.log 2>&1 &
+
+nohup java -jar -Xms512m -Xmx1024m jxc-1.0.jar  >/home/app/ikeepParent/jxc/logs/jxc.log 2>&1 &
+#tocmat
+/etc/init.d/tomcat_sysControl restart
+
+#查看文件个数
+ll |grep '^-'|wc -l  统计文件个数不统计文件夹 
+ll |wc -l  简单写法
+ll -R|grep '^-' |wc -l  递归统计包含文件夹的文件
+
+#查看当前文件夹大小
+df -h  磁盘使用情况
+du -h
+du -sk fileName 指定文件夹大小(k 为单位k)
+#记录
+Nginx根据客户端(app)版本号跳转至后台相应服务器
+#varchar 字段索引指定长度多少合适 越高重复率低
+select count(distinct left(bookkeeping_company_id, 25))/count(*) from r_bookkeeping_accounting;
+#查看指定 个数文件
+ locate /usr/local/*.gz -n 2 
+#查看防火墙开放的端口
+more /etc/sysconfig/iptables
+#查看 进程开始时间和运行时间
+ps -eo pid,lstart,etime | grep  65498
+
+nohup java -jar -Xms512m -Xmx1024m idServer-1.0-SNAPSHOT.jar >/data/app/ikeepParent-14/idServer/logs/idServer.log 2>&1 &
+nohup java -jar -Xms512m -Xmx1024m oauthServer-1.0-SNAPSHOT.jar >/data/app/ikeepParent-14/oauthServer/logs/oauth.log 2>&1 &
+nohup java -jar -Xms512m -Xmx1024m operation-1.0-SNAPSHOT.jar >/data/app/ikeepParent-14/operation/logs/operation.log 2>&1 &
+nohup java -jar -Xms512M -Xmx1024M portalsPro-1.0-SNAPSHOT.jar >/data/app/ikeepParent-14/portalsPro/logs/portalPro.log 2>&1 &
+
+#Mac 查看端口号进程
+ ps -ax |grep tomcat-dubbo
+ Netstat -anp |grep port
+#tar/zip 不解压查看压缩包文件列表
+tar -tvf my.tgz unzip -l t.zip
+
+#ikeep fsdfs 端口号排查
+tracker fdht 端口 11411 
+tracker_server 端口 22122
+storage 端口 23000  
+#查看swap 情况 
+vmstat -S m 1
+so 代表物理内存不够用虚拟内存。 si 代表物理内存够 用的是物理内存
+#查看内存和swap 整体内存消耗情况
+free -gt 
+如果发现used 和cache 相差很大 就是内存泄露 memory leak
+同时开着P_S和thread pool，不过采用”one-thread-per-connection”模式而非”pool-of-threads”模式（只用到extra port功能），不会发生内存泄露；
+
+#mysqldump 备份
+-A 全部。-B 指定数据库
+mysqldump -uroot -p -A >/Users/fuxinghua/huhu/buckup/a.sql
+
+#maven 多环境打包
+mvn clean compile package -Dmaven.test.skip=true -Ptest
+
+
