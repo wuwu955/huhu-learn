@@ -237,4 +237,9 @@ https://github.com/qiurunze123/miaosha
  
 ```
 
+### 17 系统后台数据导出接口报404？
+```pwd
+数据过多 接口响应时间超过nginx 的超时时间 返回404 
 
+https://www.cnblogs.com/wujf-myblog/p/10836954.html
+```
