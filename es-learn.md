@@ -25,7 +25,11 @@ http://localhost:9200/
 http://localhost:9000
 #kibana 操作工具
 http://localhost:5601
-
+#看版本信息
+http://203.100.87.32:9200/
+#看其他的 例如安装的插件
+http://203.100.87.32:9200/_cat/
+http://203.100.87.32:9200/_cat/plugins
 ```
 
 ### 3 index api 
