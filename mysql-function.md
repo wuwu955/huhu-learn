@@ -79,6 +79,12 @@ END WHILE;
 RETURN tmp_rs;
 END
 
+```
+###  4 取模函数
+```sql
+#跳过一行进行取数据 
+SELECT  * from 72crm_crm_leads WHERE mod(leads_id,2)=1
+
 
 ```
 
