@@ -84,8 +84,16 @@ END
 ```sql
 #跳过一行进行取数据 
 SELECT  * from 72crm_crm_leads WHERE mod(leads_id,2)=1
+#
+DDL 数据库定义语言  修改表结构 alter 
+DML 数据库操作语言  对数据库数据操作的 inster 
+DCL 数据库访问级别 权限 grant
+Having 和where 的区别在于 where 在聚合函数之前过滤数据 having 是在之后过滤数据
+group by与with rollup 是对聚合函数之后的数据在汇总 相当于 是对每列在汇总
+int(2) 这里的2 代表宽度但是超过这个宽度也没有影响 宽度一般配合 zreofill 来使用 不足的用0 来填充
 
-
+小数 表示 单精度 float 双精度 double 定点 decimal(m,d)m 精度 d 标度 超出报错 但是 其他的超出截取掉
+varchar char 代表字符长度 字节看编码集下的字节数 
 ```
 
 
