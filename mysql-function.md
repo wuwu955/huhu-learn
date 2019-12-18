@@ -92,7 +92,7 @@ Having 和where 的区别在于 where 在聚合函数之前过滤数据 having �
 group by与with rollup 是对聚合函数之后的数据在汇总 相当于 是对每列在汇总
 int(2) 这里的2 代表宽度但是超过这个宽度也没有影响 宽度一般配合 zreofill 来使用 不足的用0 来填充
 
-#浮点数和定点数 尽量用浮点数 deicmal
+#浮点数和定点数 尽量用浮点数 decimal
 小数 表示 单精度 float 双精度 double 定点 decimal(m,d)m 精度 d 标度 超出报错 但是 其他的超出截取掉
 varchar char 代表字符长度 字节看编码集下的字节数 
 #字符串函数
