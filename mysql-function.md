@@ -84,7 +84,11 @@ END
 ```sql
 #跳过一行进行取数据 
 SELECT  * from 72crm_crm_leads WHERE mod(leads_id,2)=1
-# 基础
+
+
+```
+### 5 基础知识
+```pwd
 DDL 数据库定义语言  修改表结构 alter 
 DML 数据库操作语言  对数据库数据操作的 inster 
 DCL 数据库访问级别 权限 grant
@@ -101,8 +105,43 @@ INSERT(str,pos,len,newstr)
 保留几位小数
 TRUNCATE(money,1) 
 
-```
+#视图
+create or replace view xx_view as select * from table  创建视图 注意from 后面不能跟子查询
+注意 以下的视图是不能更新的
+含有关键字 聚合函数sum() max(),distinct,group by ,having ,union union all (order by 是可以的)
+ ex:  select * from table group by 
+常量视图 select 中包含子查询
+ex: select 111 as contans  ,select (select * from xx )
+其他可以更新视图 然后表数据也同步了
+获取 表结果定义和视图
+SHOW create table t;  SHOW create view  t_view;
+with local 只要有视图满足条件就更新
+with cascaded 所有视图都要满足条件才能更新
+# 存储过程和存储函数 
+https://www.runoob.com/w3cnote/mysql-stored-procedure.html
+先编译 直接调用数据库存储引擎接口 减少网络传输开销 效率高
+存储过程和存储函数的区别是 看参数和返回值 存储过程 参数必须是in 和必须有返回值 而存储过程 参数可以是 in,out,inout 类型 没有返回值
+创建 存储过程 和存储函数
+create procedure 存储过程名(参数)
+ex CREATE PROCEDURE `get_max_hero`(in roleName VARCHAR(50),OUT hpMax FLOAT)
+BEGIN
+SELECT MAX(hp_max) from heros WHERE role_main = roleName INTO hpMax;
+end
+调用 call get_max_hero('xx');
+create function 存储函数名(参数)
+#定时事件任务器 event
+定义 一个每5秒修改值的事件
+create EVENT xx_event on schedule every 5 SECOND
+do UPDATE t set c =c+1 WHERE id =5;
+查看 事件的状态 和是否开启
+show EVENTS;
+show VARIABLES like '%schedule%'; //off 为关 0 
+set GLOBAL event_scheduler =1;//开启
+禁用和删除 事件
+alter event xx_event disable;
+drop evnet xx_event;
 
+```
 
 
 
