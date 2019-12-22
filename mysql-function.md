@@ -14,6 +14,10 @@
 order by case when job = 'SALESMAN' then comm else sal end
 # union all 只要是字段类型和字段数目相同就可以 合并 注意不能使用limit
 #使用in or not in 时注意null 值 尽量用 exists 来代替
+SELECT b.id,b.shop_name, b.shop_code, b.province_code, b.city_code, b.country_code , b.detail_address,
+  b.shop_weight, p.park_type, p.park_scale, p.decoration_degree,p.in_shop
+  FROM shop_industrial_park p INNER JOIN shop_base b ON p.shop_code = b.shop_code
+  WHERE NOT EXISTS ( SELECT u.shop_code FROM shop_audit u WHERE p.shop_code = u.shop_code AND u.audit_status = 4 )
 ```
 
 ###  2 行转列sql
