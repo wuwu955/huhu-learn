@@ -121,6 +121,7 @@ ex: select 111 as contans  ,select (select * from xx )
 SHOW create table t;  SHOW create view  t_view;
 with local 只要有视图满足条件就更新
 with cascaded 所有视图都要满足条件才能更新
+
 # 存储过程和存储函数 
 https://www.runoob.com/w3cnote/mysql-stored-procedure.html
 先编译 直接调用数据库存储引擎接口 减少网络传输开销 效率高
@@ -133,7 +134,8 @@ SELECT MAX(hp_max) from heros WHERE role_main = roleName INTO hpMax;
 end
 调用 call get_max_hero('xx');
 create function 存储函数名(参数)
-#定时事件任务器 event
+
+#定时事件任务器 event 和触发器 trigger 
 定义 一个每5秒修改值的事件
 create EVENT xx_event on schedule every 5 SECOND
 do UPDATE t set c =c+1 WHERE id =5;
@@ -144,6 +146,46 @@ set GLOBAL event_scheduler =1;//开启
 禁用和删除 事件
 alter event xx_event disable;
 drop evnet xx_event;
+触发器 查看相关资料了解一下 不推荐 使用
+
+#分区 partition  https://dev.mysql.com/doc/refman/5.7/en/partitioning-overview.html
+创建分区
+ex: CREATE TABLE members (
+    firstname VARCHAR(25) NOT NULL,
+    lastname VARCHAR(25) NOT NULL,
+    username VARCHAR(16) NOT NULL,
+    email VARCHAR(35),
+    joined DATE NOT NULL
+)
+PARTITION BY KEY(joined)
+PARTITIONS 6;
+
+CREATE TABLE members (
+    firstname VARCHAR(25) NOT NULL,
+    lastname VARCHAR(25) NOT NULL,
+    username VARCHAR(16) NOT NULL,
+    email VARCHAR(35),
+    joined DATE NOT NULL
+)
+PARTITION BY RANGE( YEAR(joined) ) (
+    PARTITION p0 VALUES LESS THAN (1960),
+    PARTITION p1 VALUES LESS THAN (1970),
+    PARTITION p2 VALUES LESS THAN (1980),
+    PARTITION p3 VALUES LESS THAN (1990),
+    PARTITION p4 VALUES LESS THAN MAXVALUE
+);
+1 好处 对表字段的值进行按值类型分区 优化查询 where  sum 和count 查询和平行计算 删除数据 通过删除分区就比delete 快
+2 查看是否支持分区 show plugins ；看到 partition 就可以了
+3 注意点 同一个分区使用同一个引擎 还有 要么分区表包含主健 要么就不包含
+4 分区类型 看这里分区表下同时索引 查询效率比较 https://blog.csdn.net/zhanaolu4821/article/details/100187231
+Range 根据列值在给定范围内将行分配给分区 使用 VALUES LESS THAN (1960),
+List 类似于通过进行分区RANGE，不同之处在于，根据匹配一组离散值之一的列选择分区
+hash  将根据由用户定义的表达式返回的值来选择一个分区，该表达式将对要插入表中的行中的列值进行操作
+key  
+columns  多个列分区  SELECT (1,10)<(10,10)from DUAL; 判断数据在哪分区可以这样0 false 1 true
+ 
+
+
 
 ```
 
