@@ -72,6 +72,7 @@ UPDATE t set c =11 where id =0
 但是每次都要检查看有没有和之前的线程造成冲突所以浪费cpu资源
 还可以 通过 show engine innodb status; 来查看
 
+4 在一个会话锁还没释放期间，在开启一个begin 或者是start transaction 就会隐性释放之前的锁
 ```
 
 
