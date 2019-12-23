@@ -183,13 +183,50 @@ List 类似于通过进行分区RANGE，不同之处在于，根据匹配一组�
 hash  将根据由用户定义的表达式返回的值来选择一个分区，该表达式将对要插入表中的行中的列值进行操作
 key  
 columns  多个列分区  SELECT (1,10)<(10,10)from DUAL; 判断数据在哪分区可以这样0 false 1 true
- 
-
-
 
 ```
 
+###  6 sql 优化
+```sql
+#查看数据库 查询和插入次数
+show status like 'Com%' ;
+#查看索引的使用情况 desc /explain
+看 type 类型  
+all 全表扫描  index 全索引扫描 range 索引范围扫描 between and > < ref 普通索引扫描或者是 唯一索引前缀扫描
+表join 中等值条件也是普通索引的 eq_ref 使用唯一索引或者是 主键 查询和join的sql  const/system 和 eq_ref 差不多都是比较迅速
 
+#EXTENDED 查看优化器对sql 做了什么 改变 EXTENDED 在之后的版本将会移除 结合 下面的warring 来用
+explain EXTENDED SELECT count(*) from t WHERE c=10;
+show WARNINGS;
+#查看sql 访问的是哪个分区
+explain PARTITION SELECT * from t WHERE c=10;
+#查看是否开启 profile yes 开启 
+SELECT @@have_profiling;
+SELECT @@profiling; 
+set profiling =1;
+#查看所有sql查询ID
+show PROFILES ;
+#根据ID 查询具体耗时操作
+show PROFILE for QUERY 390;
+
+
+#找到sql 查询进程
+show PROFILES ;
+#设置进程 根据步骤分组和时间排序
+set @query_id:=556;
+SELECT state ,sum(DURATION) as total_r,
+ROUND( 100*sum(DURATION)/(SELECT sum(DURATION) from information_schema.profiling WHERE QUERY_ID =@query_id)
+,2) as pct_r,
+COUNT(*) as calls,
+sum(DURATION)/COUNT(*) as 'r/call'
+from information_schema.profiling WHERE QUERY_ID =@query_id
+GROUP BY STATE
+ORDER BY total_r desc;
+
+#查看sql在cpu 上的消耗
+show PROFILE cpu for QUERY @query_id;
+
+```
 
 
 
