@@ -243,8 +243,3 @@ https://github.com/qiurunze123/miaosha
 
 https://www.cnblogs.com/wujf-myblog/p/10836954.html
 ```
-
-### 18 为什么 索引字段 where xx is null 使用了索引 is not null 没有使用索引？
-```pwd
-todo
-```
