@@ -266,7 +266,27 @@ InnoDB的主键索引与行记录是存储在一起的，故叫做聚集索引�
  6. join_buffer 不够大，需要对被驱动表做多次全表扫描，也就造成了“长事务”。
  7. 导致undo log 不能被回收，导致回滚段空间膨胀问题
 
+```
+### 18 为什么 索引字段 where xx is null 使用了索引 is not null 没有使用索引？
+```pwd
+todo
+```
 
-  
+### 19 索引下推现象 ICP 
+```pwd
+
+1 表t 独立索引 id ,c 
+EXPLAIN
+SELECT * from t WHERE c =30 and e BETWEEN 10 and 30;
+1	SIMPLE	t		ref	c	c	5	const	3	12.50	Using where 
+
+2 表t 独立索引 id ,c ,e 
+1	SIMPLE	t		ref	c,e	c	5	const	3	62.50	Using where
+
+3 表t 独立索引 id ,联合索引c_e
+1	SIMPLE	t		range	c_e	c_e	10		2	100.00	Using index condition
+现象 Using where 还是要回表查询 Using index condition 就不用回 2个独立索引同时出现只能一个有效
+ 
+
 ```
 
