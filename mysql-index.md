@@ -1,7 +1,5 @@
 
 
-
-
 ## 一 mysql -index 
 
 ### 1.索引是什么
@@ -287,6 +285,66 @@ SELECT * from t WHERE c =30 and e BETWEEN 10 and 30;
 1	SIMPLE	t		range	c_e	c_e	10		2	100.00	Using index condition
 现象 Using where 还是要回表查询 Using index condition 就不用回 2个独立索引同时出现只能一个有效
  
+```
+### 20 优化模糊查询 like '%xx%' 
+
+```pwd
+1 表t_s 独立索引 id ,city
+SELECT id from t_s WHERE city like '%h%'; SELECT city from t_s WHERE city like '%h%';
+1	SIMPLE	t_s		index		city	66		2	50.00	Using where; Using index
+#Using where; Using index 索引扫描和索引覆盖扫描
+SELECT * from t_s WHERE city like '%h%';
+1	SIMPLE	t_s		ALL					2	50.00	Using where
+下面sql就是没有利用 索引覆盖的特点 所以sql eq_ref 主键索引连表 前提是 like 的字段要建索引 没有索引也就没有主键ID
+EXPLAIN
+SELECT * from  t_s s INNER JOIN (SELECT id from t_s WHERE city like '%h%') b on s.id=b.id
+1	SIMPLE	t_s		index	PRIMARY	city	66		2	50.00	Using where; Using index
+1	SIMPLE	s		eq_ref	PRIMARY	PRIMARY	4	learn.t_s.id	1	100.00	
+
+```
+### 21  什么情况下没有使用索引？
+```pwd
+1 like ‘%xx’; 
+2 数据类型 出现隐式转换 where id ='1';
+3 复合索引 范围查询 或者没有满足最左原则 idx_a_b_c  where b=xx  where a=xx and c=xx;
+4 where 条件后 两个独立索引只能用一个   idx_a, idx_b  where a=x and b=xx; 
+5 索引值重复度太高 全表扫描比索引扫描要快
+6 用or 分开的条件 如果前面的条件列有索引 后面的没有 那么都不会用到  idx_a, where a=xx or b =xx;
+这里是说后面的or 要走全表扫描那么我直接一直全表扫描算了 不用再去扫索引减少io
+7 多表join 的时候 join的列值字符集不相同也是用不到  on e.name(utf-8)=b.name(gbk);
+8 多字段排序时字段排序规则不同  order by xx desc ,bb asc; 
+
+#查看索引情况理不想
+show status like 'handler_read%' ;
+Handler_read_key 值比较高的话就说明一个行被索引的次数
+Handler_read_rnd_next 值比较高的话就说明 表索引不正确和查询没有使用索引
+#优化 方法
+1 定期 分析表和检查表   analyze table xx; check table xx;
+2 优化表  optimize table xx; 整理表空间合并碎片
+innobd 设置 独立表空间 innodb_file_per_table 参数后每个表生成一个.db 文件 可以通过 alter table xx engine =innodb;
+3 这些都是在系统不忙的时候来操作
+
+```
+### 22 order by 出现file sort？
+```pwd
+索引 id idx_c_e
+1 SELECT * from t where c=10 ORDER BY c
+1	SIMPLE	t		ref	c_e	c_e	5	const	1	100.00	
+2 SELECT * from t where c=10 ORDER BY id
+1	SIMPLE	t		ref	c_e	c_e	5	const	1	100.00	Using index condition; Using filesort
+3 SELECT * from t ORDER BY c desc ,e 
+1	SIMPLE	t		ALL					8	100.00	Using filesort
+优化 加大 sort_buffer_size 值
+```
+### 23 group by 没有order by 也会 出现file sort？
+```pwd
+d没有索引 有索引虽然没有文件排序但是也是走了索引排序了
+SELECT d,COUNT(*) from t GROUP BY d  没有显示加order by 就有排序的
+1	SIMPLE	t		ALL					8	100.00	Using temporary; Using filesort
+加上 order by null 禁止排序
+explain
+SELECT d,COUNT(*) from t GROUP BY d ORDER BY null;
+1	SIMPLE	t		ALL					8	100.00	Using temporary
 
 ```
 
