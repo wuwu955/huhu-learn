@@ -252,6 +252,7 @@ select @b-@a;
     "sort_mode": "<sort_key, packed_additional_fields>"
 }
 number_of_tmp_files:排序过程中使用的临时文件数 看 mysql 45 16讲
+看索引有没有被优化器使用 主要看 trace 中 table_scan 的 rows 和 cost 对比 索引扫描 rows和cost 值的大小 
 
 ```
 
