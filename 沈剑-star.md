@@ -243,3 +243,12 @@ https://github.com/qiurunze123/miaosha
 
 https://www.cnblogs.com/wujf-myblog/p/10836954.html
 ```
+
+### 18 shiro和dubbo 和 mybaits-plugs 租户ID 做数据级别的权限？
+```pwd
+#dubbo fiter 
+https://github.com/shbeyond/midai-pay
+https://www.cnblogs.com/yufan27209/p/7324190.html
+#todo 代码实现
+
+```
