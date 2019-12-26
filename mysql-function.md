@@ -257,6 +257,7 @@ number_of_tmp_files:排序过程中使用的临时文件数 看 mysql 45 16讲
 ```
 ###  7 用bit_or（）或者bit_and（） 统计客户购买的商品信息
 ```sql
+在线 二进制 转换 https://tool.lu/hexconvert/
 用二进制数所在位来表示商品（从右到左） 1 面包 2 牛奶 3 饼干 4 啤酒  0 代表没买 1代表买了 例如 5 二进制 0101 代表 买了牛奶和啤酒
 #ddl
 CREATE TABLE `order_rab` (
@@ -269,7 +270,7 @@ CREATE TABLE `order_rab` (
 1	1	4  //第一次买了 0100 牛奶
 2	1	5  // 二次 0101 牛奶和啤酒
 3	2	4  // 第一次买了 0100 牛奶
-4	2	3  //第二次 0110 买了牛奶和饼干
+4	2	3  //第二次 0011 买了饼干和啤酒
 #统计所有购买的商品
 SELECT customer_id ,bit_or(kind) from order_rab GROUP BY customer_id
 1	5 //0101 牛奶和啤酒
