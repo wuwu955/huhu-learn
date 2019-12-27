@@ -281,7 +281,7 @@ SELECT customer_id ,bit_and(kind) from order_rab GROUP BY customer_id
 2	0 // 0000 没有
 
 ```
-```
+
 ###  8 优化数据表结构和表设计
 ```sql
 1 表结构分析 这个没有什么软用 看看就好 16，255 是去除枚举值的提示
