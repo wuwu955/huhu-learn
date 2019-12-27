@@ -289,8 +289,20 @@ SELECT * from area procedure analyse(16,255);
 2 拆分表数据 水平拆分就是一个建立多个相同表结构的表 把数据分散开来  垂直拆分就是 按列来拆分 减少表行数 多表关联
 3 反范式设计 建立适合冗余字段 但是表数据修改同步 需要使用 触发器来同步多个表的字段值
 4 经常查询计算的值 可以用中间表来先存好计算的值再来查询中间表
-
-
 ```
+### 9 锁相关查看方式
 
+```sql
+
+#查看表锁 Table_locks_waited 值高 竞争严重
+show status like 'table%';
+#查看行锁竞争 Innodb_row_lock_waits Innodb_row_lock_time_avg 高就严重
+show status like 'innodb_row_lock%';
+#查看 information_schema 表情况 事物 锁线程 和锁等待线程
+SELECT * from information_schema.innodb_trx;
+SELECT * from information_schema.innodb_locks;
+SELECT * from information_schema.innodb_lock_waits;
+#查看 innodb 状态 内存 事物 io
+show ENGINE INNODB STATUS;
+```
 
