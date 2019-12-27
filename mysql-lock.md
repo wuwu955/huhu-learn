@@ -84,7 +84,6 @@ UPDATE t set c =11 where id =0
 2 RC 级别下没有 next-key lock 只有record lock 因为没有 gap lock 
 3 RR 级别下除 主键 和唯一索引列 是record lock 以外 其他都是有next-key lock 因为要多向右遍历到第一个不满足的值
 4 insert intent lock 也是 一种特殊的gap lock
-
 ```
 
 ### 5 加锁原则
@@ -175,6 +174,12 @@ BEGIN;
 2 SELECT * from t WHERE id =33 for UPDATE;
 INSERT into t VALUES(39,39,39,39);
 
+seesion 1
+SELECT * from t WHERE id =55 for UPDATE; //55 不存在
+
+seesion 2
+INSERT into t VALUES(211,211,211,211); //锁等待
+
 ```
 
 ```pwd
@@ -185,7 +190,8 @@ INSERT into t VALUES(39,39,39,39);
 # 最后一个为什么并发执行出现死锁呢？
 插入的时候都是 （30，+∞） 需要相互等待释放间隙锁
 
-
+# 当给一个不存在的记录加上锁的时候 也会使用 next-key lock 
+insert into xx slecet * from bb  会对bb 表加表锁
 ```
 
 
@@ -209,6 +215,7 @@ INSERT into t VALUES(39,39,39,39);
 ### 1 MVCC 多版本并发控制
 
 ```pwd
+产生的原因 是因为innodb 引入事物导致事物出现了 脏读，不可重复读和幻读的问题 就用采用了 锁或者快照（snapshot）来解决
 数据多版本是一种能够进一步提高并发的方法，它的核心原理是：
 （1）写任务发生时，将数据克隆一份，以版本号区分；
 （2）写任务操作新克隆的数据，直至提交；
