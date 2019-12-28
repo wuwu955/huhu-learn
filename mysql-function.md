@@ -305,4 +305,41 @@ SELECT * from information_schema.innodb_lock_waits;
 #查看 innodb 状态 内存 事物 io
 show ENGINE INNODB STATUS;
 ```
+### 10 innodb 缓存相关的
+
+```sql
+
+#查看 innodb_buffer_pool_size 缓存大小 默认128m
+show VARIABLES like 'innodb_buffer_pool_%';
+#缓存分配个数 innodb_buffer_pool_instances 默认1 
+
+#查看 innodb_buffer_pool 使用情况 (1-Innodb_buffer_pool_reads/Innodb_buffer_pool_read_requests) 低则加 缓存值
+#Innodb_buffer_pool_wait_free 等待空白页的个数
+show STATUS like 'innodb_buffer_pool_%';
+#查看 old_sublist 大小 innodb_old_blocks_pct 默认 37
+#innodb_old_blocks_time 配置数据存在 old_sublist 的时间超过时间就放进 young_list里 如果 youngs很低就调高
+show VARIABLES like 'innodb_old_blocks%';
+
+#控制缓存刷新 延长缓存时间  innodb_max_dirty_pages_pct 脏页比例 默认75 超过就刷盘
+show VARIABLES like 'innodb_max%';
+# innodb_io_capacity 读写磁盘io 能力 默认200次/s 固态硬盘和多磁盘  可以调大  
+show VARIABLES like 'innodb_io%';
+
+#innodb 双写机制（doublewrite）
+主要是 innodb 一页数据是16k 但是操作系统是4k 为了保证数据写入的完整性 就先将脏页数据副本保存到 doublewrite buffer  然后fsync()刷盘到系统
+表空间 写入后在 把数据写入磁盘 恢复是根据系统表空间的doublewrite buffer 来对应恢复数据
+show VARIABLES like 'innodb_double%'; //默认 on 
+ 
+#查看排序合并值 Sort_merge_passes 值大就说要通过 设置 sort_buffer_size 和 join_buffer_size 来改善 group by 和 ORDER BY 的性能 
+show STATUS like  'sort%';
+show VARIABLES like 'sort_buffer_size%';
+show VARIABLES like 'join_buffer_size%';
+
+#redo log 日志文件 大小 innodb_log_file_size
+show VARIABLES like 'innodb_log%';
+
+#设置最大连接数 thread_cache_size/max_connections 接近1 说明 线程缓存命中低
+show VARIABLES like 'max_connection%';
+show VARIABLES like 'thread_cache_size';
+```
 
