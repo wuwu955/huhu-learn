@@ -250,5 +250,19 @@ https://www.cnblogs.com/wujf-myblog/p/10836954.html
 https://github.com/shbeyond/midai-pay
 https://www.cnblogs.com/yufan27209/p/7324190.html
 #todo 代码实现
+```
 
+### 19 jwt token 过期刷新？
+```pwd
+假如 token 三十分钟过期 ，过期时间少于10 分钟的时候，有请求进来可以延长 token 的过期时间；过期了，让他再掉登陆接口自己去生成token，之前在拦截器里做的每次都刷新的动作太耗频繁了 这个方案还不错
+```
+### 20 限制接口重复请求？
+```pwd
+在请求上加 token，然后弄个过滤器或者 AOP 判断下 token 是否请求过了，这个 token 一个简单的生成方法可以用毫秒级别的时间戳。问题中的业务场景需要在业务逻辑里判重，超时重发的时候里的 token 重新生成，重复提交的两次请求的 token 是一样的。 前端生成的token 只要后台没有返回数据 就不重新生成。
+```
+
+### 21 查询的fallback设计 es 失败查询数据库的场景？
+```pwd
+• 采用责任链模式处理这种情况，你无非就是想获取数据，如果当前处理者没有拿到数据，就进行下一个，否则返回。try catch 处理的是异常，不是业务上的回退。
+https://blog.csdn.net/afei__/article/details/80677711
 ```
