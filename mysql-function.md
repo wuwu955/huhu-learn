@@ -125,7 +125,7 @@ with cascaded 所有视图都要满足条件才能更新
 # 存储过程和存储函数 
 https://www.runoob.com/w3cnote/mysql-stored-procedure.html
 先编译 直接调用数据库存储引擎接口 减少网络传输开销 效率高
-存储过程和存储函数的区别是 看参数和返回值 存储过程 参数必须是in 和必须有返回值 而存储过程 参数可以是 in,out,inout 类型 没有返回值
+存储过程和存储函数的区别是 看参数和返回值 存储函数 参数必须是in 和必须有返回值 而存储过程 参数可以是 in,out,inout 类型 没有返回值
 创建 存储过程 和存储函数
 create procedure 存储过程名(参数)
 ex CREATE PROCEDURE `get_max_hero`(in roleName VARCHAR(50),OUT hpMax FLOAT)
