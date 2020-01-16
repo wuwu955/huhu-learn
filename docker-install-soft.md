@@ -316,7 +316,7 @@ docker start es-node02 && docker logs -f es-node02
 http://172.16.55.185:9200/_cluster/health
 ```
 
-### 10 docker安装rabbitmq 
+### 11 docker安装rabbitmq 
 ```pwd
 #指定版本，该版本包含了web控制页面
 docker pull rabbitmq:management
