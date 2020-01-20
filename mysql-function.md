@@ -341,5 +341,18 @@ show VARIABLES like 'innodb_log%';
 #设置最大连接数 thread_cache_size/max_connections 接近1 说明 线程缓存命中低
 show VARIABLES like 'max_connection%';
 show VARIABLES like 'thread_cache_size';
+
+#查看引擎的数据大小索引大小
+	SELECT  ENGINE,
+        ROUND(SUM(data_length) /1024/1024, 1) AS "Data MB",
+        ROUND(SUM(index_length)/1024/1024, 1) AS "Index MB",
+        ROUND(SUM(data_length + index_length)/1024/1024, 1) AS "Total MB",
+        COUNT(*) "Num Tables"
+    FROM  INFORMATION_SCHEMA.TABLES
+    WHERE  table_schema not in ("information_schema", "PERFORMANCE_SCHEMA", "SYS_SCHEMA", "ndbinfo", "sys")
+    GROUP BY  ENGINE;
+		
+ # dba 用的sql
+ https://opensource.actionsky.com/20190115-mysql/
 ```
 
