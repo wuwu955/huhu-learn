@@ -1,4 +1,4 @@
-## 记录工作中用到的sql 和函数
+## 记录工作中用到的sql 和函数以及原理知识
 
 ### 1 把列为null的转换成其他值
 
@@ -355,4 +355,31 @@ show VARIABLES like 'thread_cache_size';
  # dba 用的sql
  https://opensource.actionsky.com/20190115-mysql/
 ```
+### 11 打卡学习 第一周 2020 02-24～2020 03-01
+```sql
 
+1 优化方法 重新优化表统计信息  analyze table 和强制使用索引 use index 和调整写法加limit 或者重建索引和删除索引
+2 学习mysql 给字符串加索引 字符串太长索引比较占空间 可以采用 倒序存储，再创建前缀索引，还可以添加字段存储字符串的hash值 减少索引占用空间
+3 学习mysql为什么会抖动 原因是后台进程在刷脏页 而脏页又是内存数据与磁盘数据不一样的内存页称为脏页 脏页又是因为mysql采用WAL技术导致内存数据缓存比较多 如果内存满了就需要阻止数据更新操作 先让脏页覆盖磁盘数据 所以会导致一条更新语句为什么有时会很慢 
+对此要看 innodb_io_capacity 参数和脏页比例Innodb_buffer_pool_pages_dirty/Innodb_buffer_pool_pages_total 重点值是不能超过75%
+4 直接创建完整索引，这样可能比较占用空间；创建前缀索引，节省空间，但会增加查询扫描次数，并且不能使用覆盖索引；
+倒序存储，再创建前缀索引，用于绕过字符串本身前缀的区分度不够的问题；创建 hash 字段索引，查询性能稳定，有额外的存储和计算消耗，跟第三种方式一样，都不支持范围扫描。
+5 脏页比例
+select VARIABLE_VALUE into @a from global_status where VARIABLE_NAME = 'Innodb_buffer_pool_pages_dirty';
+select VARIABLE_VALUE into @b from global_status where VARIABLE_NAME = 'Innodb_buffer_pool_pages_total';
+select @a/@b;
+6 数据删除了表空间为什么还那么大 因为数据是标记删除的 如果主键ID一致可以复用这块空间不一致的话就会产生数据空洞 还有数据随机插入导致页分裂 修改索引值导致先删除在更新的操作也容易产生数据空洞 那么怎么看数据碎片情况呢 看data_free参数 大了就alter table t engine=innodb  这里还有独立表空间和共享表空间 独立表空间drop 表就会删除.db文件 而共享表空间删除文件但是空间还是不会释放
+7 count *统计的问题 业界方案是数据库和redis结合但是容易出现双写不一致的问题 先写数据库 在写Reids redis失败抛异常回滚数据 按道理来说应该可以 Reids单线程。 在就是count*=count1 >count id> count f 
+8 实际上，redo log 并没有记录数据页的完整数据，所以它并没有能力自己去更新磁盘数据页，也就不存在“数据最终落盘，是由 redo log 更新过去”的情况。
+如果是正常运行的实例的话，数据页被修改以后，跟磁盘的数据页不一致，称为脏页。最终数据落盘，就是把内存中的数据页写盘。这个过程，甚至与 redo log 毫无关系。
+在崩溃恢复场景中，InnoDB 如果判断到一个数据页可能在崩溃恢复的时候丢失了更新，就会将它读到内存，然后让 redo log 更新内存内容。更新完成后，内存页变成脏页，就回到了第一种情况的状态。
+9 redo log 主要节省的是随机写磁盘的 IO 消耗（转成顺序写），而 change buffer 主要节省的则是随机读磁盘的 IO 消耗。
+10 redo log 就是记录更新操作而已便于恢复 数据更新还是在内存中 并没有刷到磁盘 等待Marge 刷盘 其中主要是 1 redo log写满了刷盘 2 系统内存不足了刷盘 3 系统不忙时清理redo log  把内存数据写入磁盘 4 关机重启
+11 随机显示拼接s q l
+mysql> select count(*) into @C from t;
+set @Y = floor(@C * rand());
+set @sql = concat("select * from t limit ", @Y, ",1");
+prepare stmt from @sql;
+execute stmt;
+DEALLOCATE prepare stmt;
+```
