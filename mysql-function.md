@@ -383,3 +383,64 @@ prepare stmt from @sql;
 execute stmt;
 DEALLOCATE prepare stmt;
 ```
+
+### 12 打卡学习 第二周 2020 03-02～2020 03-08
+```sql
+1 mysql 索引失效的原因 1 索引字段用函数进行转换 会造成优化器不走索引字段扫描而去走主键id 扫描全表 2 字符串和int类型进行比较也是转换问题 3 表字符集不同 join 字段进行比较的时候也是进行了类型转换 造成索引失效
+
+2 查询为什么会这么慢 1 查询是正好进行表结构修改 会对表进行mdl 的表锁 那么会阻塞所有查询和更新的操作 2 还有就是更新操作上加了锁 然查询加了共享读锁（lock in share mode ）那么造成读写锁冲突 3 还有就是本身的索引失效导致全表扫描
+3 幻读是什么 幻读是指一个事务多次执行一条查询返回的值却是不同的值。为啥出现这种情况呢 因为数据读取到内存中 并没有对其加写锁其他事物对其修改 但是当前事物可以读到其他事物修改后的值 行锁只能锁住行，但是新插入记录这个动作，要更新的是记录之间的“间隙”。在 RR级别下加锁也就是间隙锁 (Gap Lock)。 next-key-lock 锁间隙和记录锁 来解决这个问题 
+4 select for update 语句，相当于一个 update 语句。在业务繁忙的情况下，如果事务没有及时的commit或者rollback 可能会造成其他事务长时间的等待，从而影响数据库的并发使用效率。
+select lock in share mode 语句是一个给查找的数据上一个共享锁（S 锁）的功能，它允许其他的事务也对该数据上 S锁，但是不能够允许对该数据进行修改。如果不及时的commit 或者rollback 也可能会造成大量的事务等待。
+for update 和 lock in share mode 的区别：前一个上的是排他锁（X 锁），一旦一个事务获取了这个锁，其他的事务是没法在这些数据上执行 for update ；后一个是共享锁，多个事务可以同时的对相同数据执行 lock in share mode。
+
+5 锁是加在索引上的 如果你要用 lock in share mode 来给行加读锁避免数据被更新的话，就必须得绕过覆盖索引的优化，在查询字段中加入索引中不存在的字段 
+6 在利用普通索引删除数据的时候尽量加 limit。这样不仅可以控制删除数据的条数，让操作更安全，还可以减小加锁的范围。
+
+7 SELECT  * from t WHERE c >=15 and c <=20 ORDER BY c desc LOCK in SHARE MODE; next-key-lock 
+由于是 order by c desc，第一个要定位的是索引 c 上“最右边的”c=20 的行，所以会加上间隙锁 (20,25) 和 next-key lock (15,20]。在索引 c 上向左遍历，要扫描到 c=10 才停下来，所以 next-key lock 会加到 (5,10]，这正是阻塞 session B 的 insert 语句的原因。在扫描过程中，c=20、c=15、c=10 这三行都存在值，由于是 select *，所以会在主键 id 上加三个行锁。这里 最终没有给10加行锁
+索引 c 上 (5, 25)；主键索引上 id=15、20 两个行锁。
+8 你在什么时候会把线上生产库设置成“非双 1”。我目前知道的场景，有以下这些：业务高峰期。一般如果有预知的高峰期，DBA 会有预案，把主库设置成“非双 1”。备库延迟，为了让备库尽快赶上主库。 用备份恢复主库的副本，应用 binlog 的过程，这个跟上一种场景类似。批量导入数据的时候。
+把生产库改成“非双 1”配置，是设置 innodb_flush_logs_at_trx_commit=2(表示每次事务提交时都只是把 redo log 写到 page cache。)、sync_binlog=1000(sync_binlog=N(N>1) 的时候，表示每次提交事务都 write，但累积 N 个事务后才 fsync)。
+9 在 InnoDB 中，innodb_thread_concurrency 这个参数的默认值是 0，表示不限制并发线程数量。但是，不限制并发线程数肯定是不行的。因为，一个机器的 CPU 核数有限，线程全冲进来，上下文切换的成本就会太高。所以，通常情况下，我们建议把 innodb_thread_concurrency 设置为 64~128 之间的值。
+
+
+```
+### 13 not exists 改left join sql
+```sql
+
+#left join
+SELECT u.* from user_workbench u LEFT JOIN c_accounting_company c on u.id=c.user_workbench_id WHERE MONTH(u.created) =2
+and user_workbench_id is null 
+
+1	SIMPLE	u		ALL					136	100.00	Using where
+1	SIMPLE	c		ref	idx_workbench_user_id	idx_workbench_user_id	8	gua.u.id	13	100.00	Using where; Not exists; Using index
+
+    # NOT EXISTS
+SELECT * from user_workbench u WHERE MONTH(u.created) =2 and NOT EXISTS (SELECT id from  c_accounting_company c WHERE u.id=c.user_workbench_id)
+
+1	PRIMARY	u		ALL					136	100.00	Using where
+2	DEPENDENT SUBQUERY	c		ref	idx_workbench_user_id	idx_workbench_user_id	8	gua.u.id	13	100.00	Using index
+    
+ #把not EXISTS 改写成   left join 主要是查关联ID is  null
+ 
+ 
+#开启redo_log和binglog的时间监控
+update PERFORMANCE_SCHEMA.setup_instruments set ENABLED='YES', Timed='YES' where name like '%wait/io/file/innodb/innodb_log_file%';
+update PERFORMANCE_SCHEMA.setup_instruments set ENABLED='YES', Timed='YES' where name like '%wait/io/file/sql/binlog%';
+
+
+#统计io 超过200毫秒的
+SELECT
+	event_name,
+	MAX_TIMER_WAIT 
+FROM
+	PERFORMANCE_SCHEMA.file_summary_by_event_name 
+WHERE
+	event_name IN ( 'wait/io/file/innodb/innodb_log_file', 'wait/io/file/sql/binlog' ) 
+	AND MAX_TIMER_WAIT > 200 * 1000000000;
+#清空
+truncate table performance_schema.file_summary_by_event_name;
+	
+```
+
