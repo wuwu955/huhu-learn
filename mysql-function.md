@@ -351,7 +351,19 @@ show VARIABLES like 'thread_cache_size';
     FROM  INFORMATION_SCHEMA.TABLES
     WHERE  table_schema not in ("information_schema", "PERFORMANCE_SCHEMA", "SYS_SCHEMA", "ndbinfo", "sys")
     GROUP BY  ENGINE;
-		
+# 查看对应表数据大小
+SELECT
+table_name,
+CONCAT(FORMAT(SUM(data_length) / 1024 / 1024,2),'M') AS dbdata_size,
+CONCAT(FORMAT(SUM(index_length) / 1024 / 1024,2),'M') AS dbindex_size,
+CONCAT(FORMAT(SUM(data_length + index_length) / 1024 / 1024 / 1024,2),'G') AS table_size,
+AVG_ROW_LENGTH,table_rows,update_time
+FROM
+information_schema.tables
+WHERE table_schema = 'dbName' and table_name='tbName';
+#查看磁盘数据大小
+du -sh /datas/mysql/data/db/tableName*
+
  # dba 用的sql
  https://opensource.actionsky.com/20190115-mysql/
 ```
