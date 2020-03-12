@@ -488,8 +488,20 @@ netstat -anp|grep xx
 在进行网络传输时，数据包就会按照协议栈，对上一层发来的数据进行逐层处理；然后封装上该层的协议头，再发送给下一层。
 tcpdump 和 Wireshark 就是最常用的网络抓包和分析工具，更是分析网络性能必不可少的利器
 wireshark的使用推荐阅读林沛满的《Wireshark网络分析就这么简单》和《Wireshark网络分析的艺术》
+
+捕获访问本机3306端口的报文
+tcpdump -A -XX -s0 -nn tcp dst port 3306 and dst host 172.16.5.15
+抓取哪个端口上的某个操作
+tcpdump -i any -s0 -A -nn tcp dst port 3306 and dst host 172.16.5.12 | grep -i -E
+sudo tcpdump -i any -A dst port 20880
+'SELECT|INSERT|CREATE|DROP|DELETE'
+tcpdump -i eth0 -s 0 -l -w - port 8188|strings|more
+实时抓取端口号8000的GET包，然后写入GET.log
+tcpdump -i eth0 '((port 8000) and (tcp[(tcp[12]>>2):4]=0x47455420))' -nnAl -w /tmp/GET.log
+
 ```
 ### 2 TCP 优化
 ![ m](https://static001.geekbang.org/resource/image/b0/e0/b07ea76a8737ed93395736795ede44e0.png)
+
 
 
