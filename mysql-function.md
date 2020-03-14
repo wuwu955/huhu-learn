@@ -460,15 +460,33 @@ truncate table performance_schema.file_summary_by_event_name;
 ### 14 打卡学习 第三周 2020 03-09 2020 03-15
 ```sql
 1 发送 kill 命令的客户端，并没有强行停止目标线程的执行，而只是设置了个状态，并唤醒对应的线程 而被 kill 的线程，需要执行到判断状态的“埋点”，才会开始进入终止逻辑阶段。并且，终止逻辑本身也是需要耗费时间的。2 在大事务没有提交的同时 对其kill 回滚时间比较大 也是导致kill 不掉
- 2 查询很多数据会不会把内存打爆  由于 MySQL 采用的是边算边发的逻辑，因此对于数据量很大的查询结果来说，不会在 server 端保存完整的结果集。所以，如果客户端读结果不及时，会堵住 MySQL 的查询过程，但是不会把内存打爆。 而对于 InnoDB 引擎内部，由于有淘汰策略，大查询也不会导致内存暴涨。并且，由于 InnoDB 对 LRU 算法做了改进，冷数据的全表扫描，对 Buffer Pool 的影响也能做到可控。
+
+ 2 查询很多数据会不会把内存打爆  由于 MySQL 采用的是边算边发的逻辑，因此对于数据量很大的查询结果来说，不会在 server 端保存完整的结果集。所以，如果客户端读结果不及时，会堵住 MySQL 的查询过程，但是不会把内存打爆。
+ 而对于 InnoDB 引擎内部，由于有淘汰策略，大查询也不会导致内存暴涨。并且，由于 InnoDB 对 LRU 算法做了改进，冷数据的全表扫描，对 Buffer Pool 的影响也能做到可控。
+ 
  3 MySQL 执行 join 语句的两种可能算法，这两种算法是由能否使用被驱动表的索引决定的 Index Nested-Loop Join（使用到了被驱动表上的索引） 和 Block Nested-Loop Join（没有使用到索引全表扫join_buffer比较）
+ 
  4 join 选择小表 小表的定义是两个表按照各自的条件过滤，过滤完成之后，计算参与 join 的各个字段的总数据量，数据量小的那个表，就是“小表”，应该作为驱动表。列子查询一个字段的表和所有字段的表作join 那么 一个字段的表为驱动表 
- 5 Index Nested-Loop Join（NLJ）和 Block Nested-Loop Join（BNL）1 优化的方向就是给被驱动表的关联字段加上索引；2 基于临时表的改进方案，对于能够提前过滤出小数据的 join 语句来说，效果还是很好的；
- 6 临时表和内存表的区别 内存表，指的是使用 Memory 引擎的表，建表语法是 create table … engine=memory。这种表的数据都保存在内存里，系统重启的时候会被清空，但是表结构还在。除了这两个特性看上去比较“奇怪”外，从其他的特征上看，它就是一个正常的表。而临时表，可以使用各种引擎类型 。如果是使用 InnoDB 引擎或者 MyISAM 引擎的临时表，写数据的时候是写到磁盘上的。当然，临时表也可以使用 Memory 引擎。
- 7 临时表的特征 建表语法是 create temporary table …。一个临时表只能被创建它的 session 访问，对其他线程不可见。临时表可以与普通表同名。session A 内有同名的临时表和普通表的时候，show create 语句，以及增删改查语句访问的是临时表。show tables 命令不显示临时表。
+ 
+ 5 Index Nested-Loop Join（NLJ）和 Block Nested-Loop Join（BNL）
+ 1 优化的方向就是给被驱动表的关联字段加上索引；2 基于临时表的改进方案，对于能够提前过滤出小数据的 join 语句来说，效果还是很好的；
+ 
+ 6 临时表和内存表的区别 
+ 内存表，指的是使用 Memory 引擎的表，建表语法是 create table … engine=memory。这种表的数据都保存在内存里，系统重启的时候会被清空，但是表结构还在。除了这两个特性看上去比较“奇怪”外，从其他的特征上看，它就是一个正常的表。而临时表，可以使用各种引擎类型 。如果是使用 InnoDB 引擎或者 MyISAM 引擎的临时表，写数据的时候是写到磁盘上的。当然，临时表也可以使用 Memory 引擎。
+ 
+ 7 临时表的特征 
+ 建表语法是 create temporary table …。一个临时表只能被创建它的 session 访问，对其他线程不可见。
+ 临时表可以与普通表同名。session A 内有同名的临时表和普通表的时候，show create 语句，以及增删改查语句访问的是临时表。
+ show tables 命令不显示临时表。
  8 临时表一般用于处理比较复杂的计算逻辑 。bin log设置为row模式，临时表不会同步到备库中，设置为statement模式，会同步到备库中。
+ 
  9 MySQL 5.7 版本支持了 generated column 机制关联更新 如 alter table t1 add column z int generated always as(id % 100), add index(z);
- 10 group by 优化 1如果对 group by 语句的结果没有排序要求，要在语句后面加 order by null；2 尽量让 group by 过程用上表的索引，确认方法是 explain 结果里没有 Using temporary 和 Using filesort；3 如果 group by 需要统计的数据量不大，尽量只使用内存临时表；3 也可以通过适当调大 tmp_table_size 参数，来避免用到磁盘临时表；4 如果数据量实在太大，使用 SQL_BIG_RESULT 这个提示，来告诉优化器直接使用排序算法得到 group by 的结果。
+ 10 group by 优化 
+ 1如果对 group by 语句的结果没有排序要求，要在语句后面加 order by null；
+ 2 尽量让 group by 过程用上表的索引，确认方法是 explain 结果里没有 Using temporary 和 Using filesort；
+ 3 如果 group by 需要统计的数据量不大，尽量只使用内存临时表；
+ 4 也可以通过适当调大 tmp_table_size 参数，来避免用到磁盘临时表；
+ 5 如果数据量实在太大，使用 SQL_BIG_RESULT 这个提示，来告诉优化器直接使用排序算法得到 group by 的结果。
 
 
 
