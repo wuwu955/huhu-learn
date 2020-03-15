@@ -273,7 +273,8 @@ https://blog.csdn.net/afei__/article/details/80677711
 ```pwd
 1 InnoDB 引擎的自增值，其实是保存在了内存里 “如果发生重启，表的自增值可以恢复为 MySQL 重启前的值”
 2 唯一键冲突是导致自增主键 id 不连续的第一种原因 事务回滚也会产生类似的现象
-3 批量插入 
+3 批量插入 replace … select … ，load data , insert into t1(name) select name from t2;
+4 混合插入(mixed-mode insert)
 #AUTO_INCREMENT=8
 INSERT into order_rab (id,customer_id,kind) VALUES(1,1,1),(2,2,2),(3,3,3),(null,4,4);
 #AUTO_INCREMENT=6
