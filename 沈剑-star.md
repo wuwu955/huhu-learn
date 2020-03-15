@@ -156,11 +156,14 @@ https://mp.weixin.qq.com/s/xXju0y64KKUiD06QE0LoeA
 
 ```
 
-### 11 架构师之路18年精选100篇
+### 11 架构师之路精选文章
 
 ```pwd
+2018 架构师之路精选100篇
 架构设计，运维，数据库，数据结构算法，缓存
 https://mp.weixin.qq.com/s/V1hGa6D9aGrP6PiCWEmc0w
+2019 架构师之路精选120篇
+https://mp.weixin.qq.com/s/syli7vs7Jw_VOTl5B2YUqg
 ```
 
 
@@ -265,4 +268,17 @@ https://www.cnblogs.com/yufan27209/p/7324190.html
 ```pwd
 • 采用责任链模式处理这种情况，你无非就是想获取数据，如果当前处理者没有拿到数据，就进行下一个，否则返回。try catch 处理的是异常，不是业务上的回退。
 https://blog.csdn.net/afei__/article/details/80677711
+```
+### 22 Mysql 值增ID 不连续？
+```pwd
+1 InnoDB 引擎的自增值，其实是保存在了内存里 “如果发生重启，表的自增值可以恢复为 MySQL 重启前的值”
+2 唯一键冲突是导致自增主键 id 不连续的第一种原因 事务回滚也会产生类似的现象
+3 批量插入 
+#AUTO_INCREMENT=8
+INSERT into order_rab (id,customer_id,kind) VALUES(1,1,1),(2,2,2),(3,3,3),(null,4,4);
+#AUTO_INCREMENT=6
+INSERT into order_rab (id,customer_id,kind) VALUES(1,1,1),(null,2,2),(3,3,3),(null,4,4);
+其他资料
+https://mp.weixin.qq.com/s/lSPI6UUJiZLSgV9RqqP1Rg
+https://mp.weixin.qq.com/s/jVO4f1DYoinmP3-eK9AOYA
 ```
