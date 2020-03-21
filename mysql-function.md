@@ -488,6 +488,27 @@ truncate table performance_schema.file_summary_by_event_name;
  4 也可以通过适当调大 tmp_table_size 参数，来避免用到磁盘临时表；
  5 如果数据量实在太大，使用 SQL_BIG_RESULT 这个提示，来告诉优化器直接使用排序算法得到 group by 的结果。
 
+```
+### 15 打卡学习 第四周 2020 03-16 2020 03-22
+```sql
+1 导出表数据 就是把数据库d 里的t a 大于900的导出来 成insert 语句
+mysqldump -h$host -P$port -u$user --add-locks=0 --no-create-info --single-transaction  --set-gtid-purged=OFF db1 t --where="a>900" --result-file=/client_tmp/t.sql
+2 快速的复制一张表  MySQL 5.6 版本引入了可传输表空间(transportable tablespace) 的方法
+执行 create table r like t，创建一个相同表结构的空表；
+执行 alter table r discard tablespace，这时候 r.ibd 文件会被删除；
+执行 flush table t for export，这时候 db1 目录下会生成一个 t.cfg 文件；
+在 db1 目录下执行 cp t.cfg r.cfg; cp t.ibd r.ibd；这两个命令（这里需要注意的是，拷贝得到的两个文件，MySQL 进程要有读写权限）；
+执行 unlock tables，这时候 t.cfg 文件会被删除；
+执行 alter table r import tablespace，将这个 r.ibd 文件作为表 r 的新的表空间，由于这个文件的数据内容和 t.ibd 是相同的，所以表 r 中就有了和表 t 相同的数据。
+3 left join 的语义，就不能把被驱动表的字段放在 where 条件里面做等值判断或不等值判断，必须都写在 on 里面。
+select * from a join b on(a.f1=b.f1) and (a.f2=b.f2); /*Q3*/
+select * from a join b on(a.f1=b.f1) where (a.f2=b.f2);/*Q4*/ 改写为 join 语句
+4 实际行排重后是13万，而count(distinct)确有38万为何
+38万
+select count(distinct(tid)) from tb_logs where ch='a'
+13万
+select count(*) from (select distinct(tid) from tb_logs where ch='a') t
+这个问题 尝试看看复现一下
 
 
 ```
