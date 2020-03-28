@@ -339,9 +339,17 @@ apollo-portal
 #下载数据库脚本
 https://github.com/ctripcorp/apollo/blob/master/scripts/sql/apolloconfigdb.sql
 https://github.com/ctripcorp/apollo/blob/master/scripts/sql/apolloportaldb.sql
-# 修改安装包配置文件
+# 修改安装包里配置文件的数据库配置
 application-github.properties 
 配置本地数据库
+#修改 环境地址/apollo-portal-1.6.1-github/config/application-env.properties 
+local.meta=http://localhost:8080
+dev.meta=http://localhost:8080
+fat.meta=http://fill-in-fat-meta-server:8080
+uat.meta=http://fill-in-uat-meta-server:8080
+lpt.meta=${lpt_meta}
+pro.meta=http://fill-in-pro-meta-server:8080
+
 #修改日志文件夹访问权限
 /opt/logs/100003173
 sudo chmod -R 777 100003172
@@ -350,5 +358,6 @@ sh startup.sh
 #访问路径
 http://localhost:8070/   http://localhost:8080/ http://localhost:8090/
 apollo amdin
+
 
 ```
