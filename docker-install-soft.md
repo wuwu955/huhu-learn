@@ -327,6 +327,28 @@ docker run -d --hostname my-rabbit --name rabbit -e RABBITMQ_DEFAULT_USER=user -
 #访问
 http://本地:15672/
 
+```
 
+### 12 本地安装apollo 
+```pwd
+#下载安装包
+https://github.com/ctripcorp/apollo/releases
+apollo-configservice
+apollo-adminservice
+apollo-portal
+#下载数据库脚本
+https://github.com/ctripcorp/apollo/blob/master/scripts/sql/apolloconfigdb.sql
+https://github.com/ctripcorp/apollo/blob/master/scripts/sql/apolloportaldb.sql
+# 修改安装包配置文件
+application-github.properties 
+配置本地数据库
+#修改日志文件夹访问权限
+/opt/logs/100003173
+sudo chmod -R 777 100003172
+#启动 
+sh startup.sh
+#访问路径
+http://localhost:8070/   http://localhost:8080/ http://localhost:8090/
+apollo amdin
 
 ```
