@@ -129,5 +129,5 @@ mysqldump -uroot -p -A >/Users/fuxinghua/huhu/buckup/a.sql
 
 #maven 多环境打包
 mvn clean compile package -Dmaven.test.skip=true -Ptest
-
-
+#zip
+zip -r cat-client-3.0.0.zip cat-client-3.0.0/
