@@ -16,6 +16,7 @@ ps -ef| grep 6480
 #根据进程找端口(互看) 端口号是否被占用
 netstat -nap | grep pid(端口)
 netstat -anp|grep 20880
+netstat -antp|grep 9996
 
 tcp6       0      0 :::6480(端口)                :::*                    LISTEN      4000/java (监听进程)  
 #进程和端口关系
