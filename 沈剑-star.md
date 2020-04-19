@@ -283,3 +283,11 @@ INSERT into order_rab (id,customer_id,kind) VALUES(1,1,1),(null,2,2),(3,3,3),(nu
 https://mp.weixin.qq.com/s/lSPI6UUJiZLSgV9RqqP1Rg
 https://mp.weixin.qq.com/s/jVO4f1DYoinmP3-eK9AOYA
 ```
+### 23 关于dubbo学习的几个github
+```pwd
+1 https://github.com/wuwenhui0917/dubbo-ecs
+2 https://github.com/dubboclub/dubbo-plus
+3 https://github.com/everythingbest/dubbo-postman  see issues https://github.com/apache/dubbo/issues/5951
+
+
+```
