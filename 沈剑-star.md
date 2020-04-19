@@ -287,7 +287,12 @@ https://mp.weixin.qq.com/s/jVO4f1DYoinmP3-eK9AOYA
 ```pwd
 1 https://github.com/wuwenhui0917/dubbo-ecs
 2 https://github.com/dubboclub/dubbo-plus
-3 https://github.com/everythingbest/dubbo-postman  see issues https://github.com/apache/dubbo/issues/5951
+3 https://github.com/everythingbest/dubbo-postman  
+see issues 
 
-
+https://github.com/apache/dubbo/issues/5951  请求插件的
+https://github.com/apache/dubbo/issues/5461  授权的
+https://github.com/apache/dubbo/issues/3386  自定义异常
+https://github.com/apache/dubbo/issues/2789  可以实现动态添加和删除filter
+http://dubbo.apache.org/zh-cn/docs/dev/impls/filter.html 改配置
 ```
