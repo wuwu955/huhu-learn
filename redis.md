@@ -78,11 +78,58 @@ BITPOS u:sign:1000:201904 1 # 返回的首次签到的偏移量，加上1即为�
 
 ```pwd
 #HyperLogLog 数据去重 UV数据统计
-
-
-
-
-
+pfadd sw 001 002 003 004
+1 //成功
+pfadd sw 004 0 //没有成功
+pfcount sw   //4
+#RedisBloom 布隆过滤 缓存穿透会使用到布隆过滤器
+https://oss.redislabs.com/redisbloom/Quick_Start/
+git clone https://github.com/RedisBloom/RedisBloom.git
+cd redisbloom
+make
+#启动加载模块
+redis-server  --loadmodule /Users/fuxinghua/devloop/RedisBloom/redisbloom.so
+log  Module 'bf' loaded from /Users/fuxinghua/devloop/RedisBloom/redisbloom.so //配置好了
+#测试
+bf.add user 1 
+1//成功
+bf.add user 2 //bf.madd user 3  4
+type user //MBbloom--
+bf.exists user 3 //1 存在
+bf.exists user 5 //0 不存在 //bf.mexists user 3 4
+//java 的api 操作
+https://github.com/Baqend/Orestes-Bloomfilter
+#利用 zset 的score 达到一个范围窗口的效果 进行限流
+https://www.cnblogs.com/viscu/p/9822866.html
+pipeline.zadd(key,nowTs,nowTs+""); //value和score都使用毫秒时间戳
+pipeline.zremrangeByScore(key,0,nowTs-period*1 000); //移除时间窗口之前的行为记录，剩下的都是时间窗口内的
+Response<Long> count=pipeline.zcard(key); //获得[nowTs-period*1000,nowTs]的key数量
+#漏斗限流
+安装 redis-cell   https://github.com/brandur/redis-cell 推荐下载tar包安装
+#GeoHash 地图位置 附近的人 功能 底层 zset
+geoadd city 114.175932 30.354265 wuhan
+geoadd city 116.242581 39.541688 beijing
+geoadd city 120.085167 30.144620 hangzhou
+geoadd city 113.271620 30.214504 xiantao
+geoadd city 113.545922 30.552939 xiaogan
+#两点距离(distance)
+geodist city wuhan hangzhou km //568.1838km
+#获取城市位置(position)
+geopos city wuhan // 114.17593270540237427 (lng) 30.35426555281202354(lat)
+#附近的城市排序 radius
+georadiusbymember city wuhan 100 km count 3 asc //100 公里范围内 wuhan xiantao
+#可选参数
+witdcoord:经纬度坐标(coord)
+withdist: 距离
+withhash： hash 值
+ex；georadiusbymember city wuhan 100 km withdist  count 2 asc 
+# 附近的城市 数据很多的话 用ES集群做经纬度的运算
+georadius city 114 30  100 km withdist asc
+//georadius key longitude latitude radius m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [ASC|DESC] [STORE key] [STOREDIST key]
+#scan
+ scan 0 match s* count 1 //匹配 s 开头的key 一次 返回1 个直到结束
+#定位大key
+redis-cli -h 127.0.0.1 -p 6379 --bigkeys
 
 
 ```
