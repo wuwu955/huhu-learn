@@ -1,6 +1,8 @@
 #### 第一周 2020 04-14 2020 04-19
 
 ```pwd
+#redis 集群连接
+redis-cli -h ip -p 7002 -c
 #redis 监控
 https://zhuanlan.zhihu.com/p/95716750
 redis-cli --stat
