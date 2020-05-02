@@ -510,6 +510,7 @@ select count(distinct(tid)) from tb_logs where ch='a'
 select count(*) from (select distinct(tid) from tb_logs where ch='a') t
 这个问题 尝试看看复现一下
 
-
+# 美团sql 优化文章
+https://tech.meituan.com/2014/06/30/mysql-index.html
 ```
 
