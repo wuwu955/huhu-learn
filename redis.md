@@ -133,6 +133,31 @@ georadius city 114 30  100 km withdist asc
 #定位大key
 redis-cli -h 127.0.0.1 -p 6379 --bigkeys
 
+```
+
+#### 第三周 2020 04-27 2020 05-03
+```
+#线程 IO 模型
+非阻塞 IO和 事件轮询 (多路复用) NIO 核心就是 buffer 和 轮询  先把数据写到缓冲区在提交
+指令队列/响应队列 进行处理和响应的排队
+#管道压力测试
+redis-benchmark -t set -q
+SET: 127226.46 requests per second //set 指令QPS 大约 13w/s
+redis-benchmark -t set -P 2 -q  //-P=2 2管道
+SET: 179856.11 requests per second //set 指令QPS 大约 18w/s
+#内存回收机制
+如果是del key 内存并没有被回收 而是等待新的key来使用
+如果是 flushdb 则会立刻回收所有的内存(禁用 flushdb 应该用flushall指令)
+#查看memory 内存信息
+info memory 
+#redis 快照同步和无盘同步 之间的主要区别在哪里。
+快照同步，需要先遍历当前内存中的数据生成快照，然后持久化到磁盘文件，然后再将快照文件传送给从节点。而无盘同步，则省去快照持久到磁盘文件的步骤，遍历当前内存中数据时，生成快照就直接发送给从节点了，省去持久化到磁盘的操作。
+#redis cluster
+将所有数据划分为 16384 的 slots 然后对key值使用 crc16 算法进行 hash 得到一个整数值，然后用这个整数值对 16384 进行取模来得到具体槽位。
+#将key 存储到指定的slots
+https://redis.io/topics/cluster-spec#keys-hash-tags 给需要用到的key加相同的hash tag，保证分配到同一个slot，就可以正常使用这类多个key的命令了 和事物管理
 
 ```
+
+
 
