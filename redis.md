@@ -157,7 +157,65 @@ info memory
 #将key 存储到指定的slots
 https://redis.io/topics/cluster-spec#keys-hash-tags 给需要用到的key加相同的hash tag，保证分配到同一个slot，就可以正常使用这类多个key的命令了 和事物管理
 
+
 ```
 
+#### 第四周 2020  05-04 2020 05-10
+
+```pwd
+#禁用 keys flushall flushadb 等危险命令
+Redis 在配置文件中提供了 rename-command 指令用于将某些危险的指令修改成特别的名称，用来避免人为误操作。比如在配置文件的 security 块增加下面的内容:
+rename-command keys abckeysabc
+rename-command flushall '' rename-command flushadb ''
+
+#执行 lua 脚本 EVAL SCRIPT KEY_NUM KEY1 KEY2 ... KEYN ARG1 ARG2 ....
+if redis.call("get",KEYS[1]) == ARGV[1] then
+    return redis.call("del",KEYS[1])
+else
+    return 0
+end
+set foo bar
+127.0.0.1:6379> eval 'if redis.call("get",KEYS[1]) == ARGV[1] then return redis.call("del",KEYS[1]) else return 0 end' 1 foo bar
+(integer) 1
+127.0.0.1:6379> eval 'if redis.call("get",KEYS[1]) == ARGV[1] then return redis.call("del",KEYS[1]) else return 0 end' 1 foo bar
+(integer) 0
+
+#脚本很长的可以 script load 
+script load 'lua_script' //sha
+evalsha sha
+#停止 脚本
+script kill
+#内容输出文件 和 批量操作
+$ redis-cli info > info.txt
+$ cat cmds.txt | redis-cli
+redis-cli < cmds.txt
+#重复执行指令
+// 间隔1s，执行5次，观察qps的变化
+$ redis-cli -r 5 -i 1 info | grep ops
+
+#导出 csv
+redis-cli --csv lrange lfoo 0 -1
+#执行 lua 脚本 redis-cli --eval file key1 key2
+$ cat mset.txt
+return redis.pcall('mset', KEYS[1], ARGV[1], KEYS[2], ARGV[2])
+$ cat mget.txt
+return redis.pcall('mget', KEYS[1], KEYS[2])
+$ redis-cli --eval mset.txt foo1 foo2 , bar1 bar2
+OK
+$ redis-cli --eval mget.txt foo1 foo2
+1) "bar1"
+2) "bar2"
+
+#采样服务器指令
+$ redis-cli --host ip --port 6379 monitor
+#诊断服务器时延
+$ redis-cli --host 192.168.x.x --port 6379 --latency
+$ redis-cli --latency-dist //时延的分布情况
+
+#批量删除
+redis-cli KEYS "prefix:*" | xargs redis-cli DEL
+//改成 scan
+
+```
 
 
