@@ -294,5 +294,21 @@ https://github.com/apache/dubbo/issues/5951  请求插件的
 https://github.com/apache/dubbo/issues/5461  授权的
 https://github.com/apache/dubbo/issues/3386  自定义异常
 https://github.com/apache/dubbo/issues/2789  可以实现动态添加和删除filter
+https://github.com/apache/dubbo/issues/6048  请求和响应的大小限制
+https://github.com/apache/dubbo/issues/685  超大cache文件内存溢出问题
 http://dubbo.apache.org/zh-cn/docs/dev/impls/filter.html 改配置
 ```
+### 24 关于dubbo group 和 payload 负载的用法
+```
+group 配置  
+ServiceConfig ReferenceConfig
+RegistryConfig
+payload 配置 默认是 8M
+ProtocolConfig 
+ProviderConfig
+ex
+ <dubbo:provider id ="默认dubbo" group="xxx" payload="1048576" /> //1M
+ <dubbo:service interface="com.ikeep.platform.sdk.tdk.TdkSetSdk" ref="tdkSdkImpl"
+                   register="true" protocol="dubbo" timeout="30000" provider="默认dubbo" />
+```
+
