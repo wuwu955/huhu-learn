@@ -513,4 +513,10 @@ select count(*) from (select distinct(tid) from tb_logs where ch='a') t
 # 美团sql 优化文章
 https://tech.meituan.com/2014/06/30/mysql-index.html
 ```
+### 添加多个字段和重命名表
+```
+alter table table_name add (xx ,xxx);
+alter table table_name rename to table_new;
+```
+
 
