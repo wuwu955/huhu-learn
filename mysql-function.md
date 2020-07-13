@@ -513,10 +513,20 @@ select count(*) from (select distinct(tid) from tb_logs where ch='a') t
 # 美团sql 优化文章
 https://tech.meituan.com/2014/06/30/mysql-index.html
 ```
-### 添加多个字段和重命名表
+### 16 添加多个字段和重命名表
 ```
 alter table table_name add (xx ,xxx);
 alter table table_name rename to table_new;
 ```
+### 17 分组后求最后一条记录
+```
+分组拼接id 然后截取 在inner join 
+#截取最小记录
+select SUBSTRING_INDEX(GROUP_CONCAT(valid_date order by id),',',1) From jct_emp_hire where emp_number = '1091034' group by emp_id;
+#截取最大记录
+select SUBSTRING_INDEX(GROUP_CONCAT(valid_date order by id desc),',',1) From jct_emp_hire where emp_number = '1091034' group by emp_id;
+#截取特定第几条数据
+select SUBSTRING_INDEX(SUBSTRING_INDEX(GROUP_CONCAT(valid_date order by id),',',4),',',-1) From jct_emp_hire where emp_number = '1091034' group by emp_id;
 
+```
 
