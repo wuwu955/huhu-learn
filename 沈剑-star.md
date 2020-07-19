@@ -289,6 +289,7 @@ https://mp.weixin.qq.com/s/jVO4f1DYoinmP3-eK9AOYA
 2 https://github.com/dubboclub/dubbo-plus
 3 https://github.com/everythingbest/dubbo-postman  
 4 https://github.com/lshm/dubbo-gzip //dubbo 对数据进行压缩
+5 https://github.com/open-wrapper/dubbo-wrapper //包装项目
 see issues 
 
 https://github.com/apache/dubbo/issues/5951  请求插件的
