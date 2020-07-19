@@ -288,6 +288,7 @@ https://mp.weixin.qq.com/s/jVO4f1DYoinmP3-eK9AOYA
 1 https://github.com/wuwenhui0917/dubbo-ecs
 2 https://github.com/dubboclub/dubbo-plus
 3 https://github.com/everythingbest/dubbo-postman  
+4 https://github.com/lshm/dubbo-gzip //dubbo 对数据进行压缩
 see issues 
 
 https://github.com/apache/dubbo/issues/5951  请求插件的
@@ -297,6 +298,7 @@ https://github.com/apache/dubbo/issues/2789  可以实现动态添加和删除fi
 https://github.com/apache/dubbo/issues/6048  请求和响应的大小限制
 https://github.com/apache/dubbo/issues/685  超大cache文件内存溢出问题
 http://dubbo.apache.org/zh-cn/docs/dev/impls/filter.html 改配置
+
 ```
 ### 24 关于dubbo group 和 payload 负载的用法
 ```
