@@ -40,7 +40,9 @@
   RegistryDirectory：注册目录服务，他的Invoker集合数据来源于zk注册中心的，他实现了NotifyListener接口，并且实现回调notify(List<URL> urls),
                                                            整个过程有一个重要的map变量，methodInvokerMap（它是数据的来源；同时也是notify的重要操作对象，重点是写操作。）
   
- 
+ 9 配置timeout
+ 1 精确优先（method） 全局次之 
+ 2 消费者优先 提供者次之
 ```
 
 
