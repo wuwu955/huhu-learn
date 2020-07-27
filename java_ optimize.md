@@ -528,4 +528,12 @@ http {
 通过快速过期，或者出比较难的验证码问题，防止机器刷单。
 
 ```
+### 5 Spring父容器和SpringMvc子容器的扫描
+```
+父容器
+Spring-app.xml component-scan
+扫描包 @Component, @Repository, @Service,@Controller, @RestController, @ControllerAdvice, and @Configuration 
+Spring-mvc.xml component-scan 
+也是扫描相同的注解 就会造成重复扫描 可以使用 use-default-filters false 来关掉重复的扫描
 
+```
