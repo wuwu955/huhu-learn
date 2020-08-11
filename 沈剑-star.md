@@ -299,6 +299,7 @@ https://github.com/apache/dubbo/issues/2789  可以实现动态添加和删除fi
 https://github.com/apache/dubbo/issues/6048  请求和响应的大小限制
 https://github.com/apache/dubbo/issues/685  超大cache文件内存溢出问题
 http://dubbo.apache.org/zh-cn/docs/dev/impls/filter.html 改配置
+https://github.com/apache/dubbo/issues/5461 //服务鉴权
 
 ```
 ### 24 关于dubbo group 和 payload 负载的用法
