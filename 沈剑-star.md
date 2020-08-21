@@ -293,7 +293,6 @@ https://mp.weixin.qq.com/s/jVO4f1DYoinmP3-eK9AOYA
 see issues 
 
 https://github.com/apache/dubbo/issues/5951  请求插件的
-https://github.com/apache/dubbo/issues/5461  授权的
 https://github.com/apache/dubbo/issues/3386  自定义异常
 https://github.com/apache/dubbo/issues/2789  可以实现动态添加和删除filter
 https://github.com/apache/dubbo/issues/6048  请求和响应的大小限制
