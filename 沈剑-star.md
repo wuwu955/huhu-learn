@@ -285,6 +285,9 @@ https://mp.weixin.qq.com/s/jVO4f1DYoinmP3-eK9AOYA
 ```
 ### 23 关于dubbo学习的几个github
 ```pwd
+组织
+qq群号 222162989 433657720
+github
 1 https://github.com/wuwenhui0917/dubbo-ecs
 2 https://github.com/dubboclub/dubbo-plus
 3 https://github.com/everythingbest/dubbo-postman  
