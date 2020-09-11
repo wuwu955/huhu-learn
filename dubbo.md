@@ -424,9 +424,9 @@ demoService.sayHello("world" + i)
                             -->invokers.get(currentSequence % length)//取模轮循
               -->Result result = invoker.invoke(invocation)
 --------------------------------------------------------------------------扩展点----------------
-                -->InvokerWrapper.invoke
+                -->InvokerWrapper.invoke // 在把url 转换成invoke 的时候 用 这个类InvokerDelegete去包装了
                   -->ProtocolFilterWrapper.invoke
-                    -->ConsumerContextFilter.invoke
+                    -->ConsumerContextFilter.invoke 
                       -->ProtocolFilterWrapper.invoke
                         -->MonitorFilter.invoke
                           -->ProtocolFilterWrapper.invoke
@@ -485,9 +485,19 @@ provider  192.168.100.38    192.168.48.32
 2.路由规则有哪些实现类？    
 ConditionRouter：条件路由，后台管理的路由配置都是条件路由。
 ScriptRouter：脚本路由       
-              
-
-
+            
+流程描述
+1 先InvokerInvocationHandler 进行包装处理
+2 进入MockClusterInvoker 看有没有配置Mock(force fail) 服务降级规则
+3 AbstractClusterInvoker 在这个类中获取所有的invokes 和 负载均衡策略LoadBalance 
+  调用 AbstractDirectory ->RegistryDirectory dolist(从Map中获取) toInvokers  been refer 进行 InvokerDelegate 包装成 InvokerWrapper 
+  调用 doInvoke 根据 Apdate 获取集群容错的策略
+4 调用 FailoverClusterInvoker（默认失败重试） 的 doInvoke  其中 select——>doselect ->loadbalance
+  采用负载均衡策略LoadBalance 的对象方法 然后在 invoke
+5 InvokerWrapper.invoke ProtocolFilterWrapper buildInvokerChain 进入过滤器链
+6 ConsumerContextFilter 设置RpcContext MonitorFilter FutureFilter 是否是异步调用
+7 AbstractInvoker ->DubboInvoker.doinvoke 
+8 netty 的发送和接收
 ```
 
 #### 七 服务提供者响应流程
