@@ -295,6 +295,7 @@ github
 5 https://github.com/open-wrapper/dubbo-wrapper //包装项目
 //中间件兴趣圈
 6 https://mp.weixin.qq.com/mp/homepage?__biz=MzIzNzgyMjYxOQ==&hid=4&sn=e2e1e309c71dbc9677a4e367a10a99eb
+7 https://github.com/CrazyHZM/crazy-code-analysis/tree/master/dubbo
 see issues 
 
 https://github.com/apache/dubbo/issues/5951  请求插件的
