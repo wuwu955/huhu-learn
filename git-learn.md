@@ -25,9 +25,11 @@
 #打tag
      git brench master
      (1)、git tag  (展示项目的所有tag版本)
-     (2)、git tag v1.0(tag新版本号)
+     (2)、git tag v1.0(tag新版本号) -m 'Release features'
      (3)、git push origin v1.0(tag新版本号)
 
+see 
+https://blog.csdn.net/b735098742/article/details/78935748
 ```
 
 ## 3 合并 fork 的仓库发生冲突
