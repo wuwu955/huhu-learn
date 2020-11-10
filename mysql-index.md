@@ -347,4 +347,15 @@ SELECT d,COUNT(*) from t GROUP BY d ORDER BY null;
 1	SIMPLE	t		ALL					8	100.00	Using temporary
 
 ```
+### 24 更新语句流程
+```pwd
+#更新数据流程
+1 更新内存值 buffer pool
+2 记录redo log 先做 prepare 等待 bin log commit 
+3 bin log commit 
+4 redo log commit 
+```
+
+
+
 
