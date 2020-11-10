@@ -406,3 +406,28 @@ innodb_max_dirty_pages_pct
 O_DIRECT的flush_method更适合于操作系统内存有限的情况下（可以避免不必要的对交换空间的读写操作），否则，它会由于禁用了os的缓冲降低对数据的读写操作的效能。
  
 使用memlock可以避免MySQL内存进入swap
+
+--------------------------------------
+
+#jdbc 交互时间
+show GLOBAL VARIABLES LIKE 'wait%'
+
+#sql 数据包  in () 批量 insert  导致插入报错
+show VARIABLES LIKE 'max_all%';
+max_allowed_packet 4M
+
+#通信
+单工 遥控器
+半双工  对讲机 mysql 
+双工  电话 
+#最后一条sql 执行的时间
+show STATUS like 'last_query_cost'
+# optimizer_trace 优化器 跟踪
+show VARIABLES LIKE 'OPTIMIZE%';
+
+#buffer pool 增加查询和修改数据的缓存池
+show STATUS like '%buffer_pool%'
+#大小128M
+show VARIABLES LIKE '%buffer_pool%';
+
+
