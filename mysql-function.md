@@ -529,4 +529,9 @@ select SUBSTRING_INDEX(GROUP_CONCAT(valid_date order by id desc),',',1) From jct
 select SUBSTRING_INDEX(SUBSTRING_INDEX(GROUP_CONCAT(valid_date order by id),',',4),',',-1) From jct_emp_hire where emp_number = '1091034' group by emp_id;
 
 ```
+### 18 trim函数 过滤指定的字符串：
+```
+ 去除首尾的,
+ SELECT TRIM(BOTH ',' FROM ',50,9,10,11,22,24,25,28,29,30,37,38,42,44,45,46,47,48,49,51,52,53,54,55,7,4,');
 
+```
