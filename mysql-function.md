@@ -31,6 +31,16 @@ select a.id,substring_index(substring_index(a.col,',',b.id),',',-1) as person_id
         jsh_functions as b
  on b.id < (char_length(a.col) - char_length(replace(a.col,',',''))+1)+1
 
+# 补充生成自增序号 序号生成最好是采取拼接字符串里的id 是哪个表就哪个表来做 
+ select a.work_id,substring_index(substring_index(TRIM(BOTH ',' FROM a.col),',',b.row_number),',',-1) as user_id
+        from
+        (select `owner_user_id` as col,work_id  from 72crm_work ) as a
+        join
+        (select (@ROW:=@ROW+1) row_number from 72crm_admin_user a,(SELECT @ROW:=0) r) as b
+ on b.row_number < (char_length(TRIM(BOTH ',' FROM a.col)) - char_length(replace(TRIM(BOTH ',' FROM a.col),',',''))+1)+1
+ WHERE a.work_id =7
+
+
 ```
 
 ### 3 获取字符串中的大写字母
