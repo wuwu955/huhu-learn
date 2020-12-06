@@ -545,3 +545,11 @@ select SUBSTRING_INDEX(SUBSTRING_INDEX(GROUP_CONCAT(valid_date order by id),',',
  SELECT TRIM(BOTH ',' FROM ',50,9,10,11,22,24,25,28,29,30,37,38,42,44,45,46,47,48,49,51,52,53,54,55,7,4,');
 
 ```
+### 19 判断数据是否存在
+```
+ 0 否 1是
+ select exists( select 1 from t_dict where DICT_ID =30 and KEYY =0 )
+ ```         
+           
+     
+				
