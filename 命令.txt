@@ -12,6 +12,7 @@ top -Hp pid(项目pid)       printf '%x\n' pid(cpu高的pid)
 jstack pid(项目pid) | grep [16]
 #查看哪些进程打开了端口(根据端口找进程)
 lsof -i:6480
+lsof |grep deleted  查看所有已打开文件并筛选出其中已删除状态的文件
 ps -ef| grep 6480 
 #根据进程找端口(互看) 端口号是否被占用
 netstat -nap | grep pid(端口)
@@ -88,8 +89,9 @@ ll -R|grep '^-' |wc -l  递归统计包含文件夹的文件
 
 #查看当前文件夹大小
 df -h  磁盘使用情况
-du -h
+du -h  显示文件大小
 du -sk fileName 指定文件夹大小(k 为单位k)
+du -sm * | sort -nr  统计当前目录下文件大小，并按照大小排序
 #记录
 Nginx根据客户端(app)版本号跳转至后台相应服务器
 #varchar 字段索引指定长度多少合适 越高重复率低
@@ -143,3 +145,4 @@ tail -n +200 portalsPro.log |grep -C 10 com.ikeep.domain.staging.Staging.checkRo
 tail -n 200 portalsPro.log |grep -C 10 com.ikeep.domain.staging.Staging.checkRoleById 
 
 https://www.cnblogs.com/mfryf/p/3336288.html
+
