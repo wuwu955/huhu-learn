@@ -146,3 +146,8 @@ tail -n 200 portalsPro.log |grep -C 10 com.ikeep.domain.staging.Staging.checkRol
 
 https://www.cnblogs.com/mfryf/p/3336288.html
 
+#arthas 重新进入
+dashboard 退出 q
+telnet localhost 3658 
+
+
