@@ -550,7 +550,7 @@ select SUBSTRING_INDEX(SUBSTRING_INDEX(GROUP_CONCAT(valid_date order by id),',',
  0 否 1是
  select exists( select 1 from t_dict where DICT_ID =30 and KEYY =0 )
  ```         
-### 20 行转列 动态拼接sql
+### 20 行转列 动态拼接sql 使用扩展表里的k v 值和主表结合
  ```  
  #原来的sql
 SELECT user_name, max(IF( SUBJECT = '数学', score, 0 )) AS '数学', 
