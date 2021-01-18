@@ -550,6 +550,34 @@ select SUBSTRING_INDEX(SUBSTRING_INDEX(GROUP_CONCAT(valid_date order by id),',',
  0 否 1是
  select exists( select 1 from t_dict where DICT_ID =30 and KEYY =0 )
  ```         
-           
-     
+### 20 行转列 动态拼接sql
+ ```  
+ #原来的sql
+SELECT user_name, max(IF( SUBJECT = '数学', score, 0 )) AS '数学', 
+max(IF( SUBJECT = '生物', score, 0 )) AS '生物',
+max(IF( SUBJECT = '英语', score, 0 )) AS '英语',
+max(IF( SUBJECT = '语文', score, 0 )) AS '语文' 
+FROM sc GROUP BY user_name
+user_name 数学    生物     英语    语文
+张三	90	85	70	80
+李四	90	85	70	80
+ 
+ #动态 拼接
+set @splice_sql = null;
+SELECT 
+    GROUP_CONCAT(DISTINCT
+        CONCAT('max(if(subject=''',subject,''', score, 0)) as ''',subject, ''''))
+    into @splice_sql
+from sc;
+set @splice_sql = CONCAT('select user_name,', @splice_sql, ' from sc group by user_name');
+#预处理 相当于用占位符
+prepare bella_test from @splice_sql;
+#执行
+execute bella_test;
+#释放资源
+DEALLOCATE prepare bella_test;
+
+ #prepare 预处理
+ https://www.cnblogs.com/geaozhang/p/9891338.html
+ ```   
 				
