@@ -538,6 +538,11 @@ select SUBSTRING_INDEX(GROUP_CONCAT(valid_date order by id desc),',',1) From jct
 #截取特定第几条数据
 select SUBSTRING_INDEX(SUBSTRING_INDEX(GROUP_CONCAT(valid_date order by id),',',4),',',-1) From jct_emp_hire where emp_number = '1091034' group by emp_id;
 
+#取一个值的最新或者最早记录的
+SELECT r.return_time
+from 72crm_crm_receivables r WHERE c.contract_id=r.contract_id and c.owner_user_id=r.owner_user_id and check_status =1
+ORDER BY r.return_time DESC LIMIT 1
+) as return_time  from 72crm_crm_contract c  WHERE c.check_status =1
 ```
 ### 18 trim函数 过滤指定的字符串：
 ```
