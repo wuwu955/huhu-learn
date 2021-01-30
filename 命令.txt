@@ -150,5 +150,7 @@ https://www.cnblogs.com/mfryf/p/3336288.html
 #arthas 重新进入
 dashboard 退出 q
 telnet localhost 3658 
+# 查看线程数
+ps -L -p [pid] | wc -l
 
 
