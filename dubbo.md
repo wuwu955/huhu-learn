@@ -641,4 +641,9 @@ public class <扩展点接口名>$Adpative implements <扩展点接口> {
 
 
 ```
+#### 11 踩过的坑
+```
+https://github.com/edwardlee03/issue-case/tree/master/dubbo
+```
+
 
