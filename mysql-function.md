@@ -585,4 +585,13 @@ DEALLOCATE prepare bella_test;
  #prepare 预处理
  https://www.cnblogs.com/geaozhang/p/9891338.html
  ```   
+ ### 21 伪列
+```
+set @avg := -1;
+select * from (select d.issue,d.q1,d.q2,d.q3,d.q4,d.q5,(@avg := @avg+1) average 
+from dlt_result d order by d.issue asc) as tmp order by issue desc
+https://www.cnblogs.com/shuilangyizu/p/7866479.html
+
+
+ ``` 
 				
