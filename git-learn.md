@@ -44,3 +44,36 @@ git checkout master git merge --no-ff mercyblitz-master git push origin master
 
 ```
 
+
+## 4 回滚提交后代码
+
+```pwd
+1、git commit到本地分支、但没有git push到远程
+
+git log # 得到你需要回退一次提交的commit id
+git reset --hard <commit_id>  # 回到其中你想要的某个版
+或者
+git reset --hard HEAD^  # 回到最新的一次提交
+或者
+git reset HEAD^  # 此时代码保留，回到 git add 之前
+
+2、git push把修改提交到远程仓库
+1）通过git reset是直接删除指定的commit
+
+git log # 得到你需要回退一次提交的commit id
+git reset --hard <commit_id>
+git push origin HEAD --force # 强制提交一次，之前错误的提交就从远程仓库删除
+
+2）通过git revert是用一次新的commit来回滚之前的commit
+
+git log # 得到你需要回退一次提交的commit id
+git revert <commit_id>  # 撤销指定的版本，撤销也会作为一次提交进行保存
+
+3） git revert 和 git reset的区别
+- git revert是用一次新的commit来回滚之前的commit，此次提交之前的commit都会被保留；
+- git reset是回到某次提交，提交及之前的commit都会被保留，但是此commit id之后的修改都会被删除
+
+
+参考 https://blog.csdn.net/asoar/article/details/84111841
+```
+
