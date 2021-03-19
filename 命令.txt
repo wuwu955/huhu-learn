@@ -169,3 +169,18 @@ https://www.linuxprobe.com/linux-cpu-message.html
 　　2.2 将当前目录下的所有文件内的“garden”替换成“mirGarden”
 　　## sed -i "s/garden/mirGarden/g" `ls` //其实也就是ls出多个文件名而已
 
+#maven 环境变量问题
+https://blog.csdn.net/keeprunning95/article/details/81330825
+netstat -ano | findstr "9527"
+taskkill /pid 19644 /f
+# 切换openjdk
+https://blog.csdn.net/nmj2015/article/details/72371591?utm_source=blogxgwz1
+npm install -g webpack webpack-cli
+#sed 脚本提示语法错误 vim -b ss.sh 多了“^M”
+https://blog.csdn.net/xzm5708796/article/details/88344074
+#解压 tar.xz 文件
+https://www.cnblogs.com/wenxingxu/p/9603654.html
+#查看文件大小
+ls -lht 
+# liunx git clone 问题
+https://blog.csdn.net/gbz3300255/article/details/97103621
