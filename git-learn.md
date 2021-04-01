@@ -76,7 +76,7 @@ git revert <commit_id>  # 撤销指定的版本，撤销也会作为一次提交
 
 参考 https://blog.csdn.net/asoar/article/details/84111841
 ```
-## 查看分支的创建人
+## 5 查看分支的创建人
 ```
 git log --oneline dev | cut -d " " -f 1 | tail -1 | xargs git log
 ```pwd
