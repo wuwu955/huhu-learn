@@ -79,4 +79,4 @@ git revert <commit_id>  # 撤销指定的版本，撤销也会作为一次提交
 ## 5 查看分支的创建人
 ```
 git log --oneline dev | cut -d " " -f 1 | tail -1 | xargs git log
-```pwd
+```
