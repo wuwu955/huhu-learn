@@ -361,3 +361,68 @@ apollo amdin
 
 
 ```
+
+### 12 服务器安装Yapi 
+```
+
+实测有效安装方法 2020年12月20日
+主要修改了以下内容：
+
+node14 版本必须 < 15
+通过官方文档的手动安装并修改部分内容
+修改 config.json
+删除 package-lock.json
+本地主机：MacOS 10.16.7
+
+环境：
+
+HomeBrew
+mongodb 4.4.1（通过 HomeBrew 安装）
+node 14（通过 HomeBrew 安装）⚠️ 特别注意：一定要 < 15（亲测15版本Node会报依赖错误）
+YApi（依赖Node & mongodb）
+pm2（依赖Node 来保护YApi进程）
+安装过程：
+HomeBrew 略
+
+mongodb 略
+https://blog.csdn.net/sinat_27245917/article/details/108997450
+node@14 略
+
+pm2 略
+
+YApi手动部署：
+安装-手动
+
+mkdir yapi 
+cd yapi 
+git clone https://github.com/YMFE/yapi.git vendors 
+cp vendors/config_example.json ./config.json // ⚠️  复制完成后把内容修改为 config.json
+cd vendors 
+rm package-lock.json // ⚠️ 一定要删除 package-lock.json 
+npm install --production --registry https://registry.npm.taobao.org 
+npm run install-server  //得到账号密码
+node server/app.js 
+后台启动 pm2
+// 报 MongoNetworkError: Authentication failed., mongodb Authentication failed 
+#修改 mongodb 的数据库
+一、配置MongoDB
+第一步：创建数据库
+use yapi
+第二步：创建用户并配置权限
+db.createUser({user:"username",pwd:"123456",roles:[{"role":"readWrite","db":"yapi"}]})
+
+二、配置YApi（config.json）
+"db": {
+   "servername": "127.0.0.1",
+   "DATABASE": "yapi",
+   "port": 27017,
+   "user": "username",
+   "pass": "123456",
+   "authSource": ""
+ }
+三  show dbs 命
+ db.runoob.insert({"name":"菜鸟教程"})
+
+ln -s /usr/local/node/bin/pm2 /usr/local/bin/
+
+```
