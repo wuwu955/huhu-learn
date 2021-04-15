@@ -80,3 +80,12 @@ git revert <commit_id>  # 撤销指定的版本，撤销也会作为一次提交
 ```
 git log --oneline dev | cut -d " " -f 1 | tail -1 | xargs git log
 ```
+
+## 6 克隆别人项目 修改后push 到自己仓库
+```
+1 创建自己的项目仓库复制项目git 地址
+2 修改.git 文件中config 文件 把url 换成自己的仓库地址
+3 push 报错 Updates were rejected because the tip of your current branch is behind 采用下面的命令push
+4 git push -f origin master
+
+```
