@@ -139,7 +139,9 @@ zip -r cat-client-3.0.0.zip cat-client-3.0.0/
 unzip cat.war -d /Users/fuxinghua/desktop/cat/
 
 #查看文件中指定字符串出现的上下几行
-cat xx.log |grep -C 10 sss
+cat xx.log |grep -C 10 sss '关键字' 显示“关键字”及前10行
+cat xx.log | grep -B 5 '关键字' 显示“关键字”及前5行
+cat xx.log | grep -A 5 '关键字' 显示“关键字”及后5行
 //从第200行开始查
 tail -n +200 portalsPro.log |grep -C 10 com.ikeep.domain.staging.Staging.checkRoleById 
 //最后200行到结束
