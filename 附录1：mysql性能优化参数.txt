@@ -430,4 +430,7 @@ show STATUS like '%buffer_pool%'
 #大小128M
 show VARIABLES LIKE '%buffer_pool%';
 
+#多个Buffer Pool优化并发能力
+innodb_buffer_pool_instances = 4
+
 
