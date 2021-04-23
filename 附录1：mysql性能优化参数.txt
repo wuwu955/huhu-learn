@@ -432,5 +432,7 @@ show VARIABLES LIKE '%buffer_pool%';
 
 #多个Buffer Pool优化并发能力
 innodb_buffer_pool_instances = 4
-
+# 基于chunk机制是如何支持运行期间，动态调整buffer pool大小
+innodb_buffer_pool_chunk_size
+chunk有1000个数量限制。在我们的例子当中，每个instance不能超过62个chunk
 
