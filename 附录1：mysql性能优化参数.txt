@@ -436,3 +436,18 @@ innodb_buffer_pool_instances = 4
 innodb_buffer_pool_chunk_size
 chunk有1000个数量限制。在我们的例子当中，每个instance不能超过62个chunk
 
+#线上数据库莫名其妙的随机性能抖动优化
+1 可能buffer pool的缓存页都满了，此时你执行一个SQL查询很多数据，一下子要把很多缓存页
+flush到磁盘上去，刷磁盘太慢了，就会导致你的查询语句执行的很慢
+2 可能你执行更新语句的时候，redo log在磁盘上的所有文件都写满了，此时需要回到第一个
+redo log文件覆盖写，覆盖写的时候可能就涉及到第一个redo log文件里有很多redo log日志对应的更
+新操作改动了缓存页，那些缓存页还没flush到磁盘，此时就必须把那些缓存页flush到磁盘，才能执行
+后续的更新语句
+
+解决方法
+所以通常都会建议大家对数据库部署机器的SSD固态硬盘能承载的最大随机IO速率做一个测试，这个可
+以使用fio工具来测试
+innodb_io_capacity设置为SSD固态硬盘的IOPS(随机io速率)，让他刷缓存页尽量快，同时设置
+innodb_flush_neighbors为0，让他每次别刷临近缓存页，减少要刷缓存页的数量，这样就可以把刷缓
+存页的性能提升到最高。
+
