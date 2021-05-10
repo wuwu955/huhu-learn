@@ -356,6 +356,20 @@ SELECT d,COUNT(*) from t GROUP BY d ORDER BY null;
 4 redo log commit 
 ```
 
+### 25 where 语句后 order by 和group  by  出现file sort？
+```pwd
+#sql
+SELECT * FROM `t_account` WHERE name ='娃哈哈' ORDER BY phone;
+创建 单独索引name 和phone 只能用到name一个索引 出现file sort情况
+原因 order by和group  by 是基于最左匹配原则 
+所以 这里要建立联合索引来避免出现file sort
+
+ALTER table t_account add index idx_name_phone_gender(name,phone,gender)
+explain
+SELECT * FROM `t_account` WHERE name ='娃哈哈' ORDER BY phone;
+condition
+```
+
 
 
 
