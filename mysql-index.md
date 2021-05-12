@@ -335,6 +335,7 @@ innobd 设置 独立表空间 innodb_file_per_table 参数后每个表生成一�
 3 SELECT * from t ORDER BY c desc ,e 
 1	SIMPLE	t		ALL					8	100.00	Using filesort
 优化 加大 sort_buffer_size 值
+加 联合索引 看25个案例
 ```
 ### 23 group by 没有order by 也会 出现file sort？
 ```pwd
