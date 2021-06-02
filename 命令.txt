@@ -186,3 +186,7 @@ https://www.cnblogs.com/wenxingxu/p/9603654.html
 ls -lht 
 # liunx git clone 问题
 https://blog.csdn.net/gbz3300255/article/details/97103621
+
+#查看进程打开文件文件句柄的数目
+ cat /proc/pid/limits | grep open
+
