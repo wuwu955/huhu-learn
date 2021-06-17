@@ -215,6 +215,7 @@ $ redis-cli --latency-dist //时延的分布情况
 #批量删除
 redis-cli KEYS "prefix:*" | xargs redis-cli DEL
 //改成 scan
+redis-cli --scan --pattern 'a_*' | xargs -L 2000 redis-cli del
 
 ```
 
