@@ -193,15 +193,10 @@ https://blog.csdn.net/gbz3300255/article/details/97103621
 #常用的压缩命令
 
 zip：压缩zip文件命令，比如zip test.zip 文件可以把文件压缩成zip文件，如果压缩目录的话则需添加-r选项。
-
 unzip：与zip对应，解压zip文件命令。unzip xxx.zip直接解压，还可以通过-d选项指定解压目录。
-
 gzip：用于压缩.gz后缀文件，gzip命令不能打包目录。需要注意的是直接使用gzip 文件名源文件会消失，如果要保留源文件，可以使用gzip -c 文件名 > xx.gz，解压缩直接使用gzip -d xx.gz
-
 tar：tar常用几个选项，-x解打包，-c打包，-f指定压缩包文件名，-v显示打包文件过程，一般常用tar -cvf xx.tar 文件来打包，解压则使用tar -xvf xx.tar
-
 linux 的打包和压缩是分开的操作，如果要打包并且压缩的话，按照前面的做法必须先用tar打包，然后再用gzip压缩。当然，还有更好的做法就是-z命令，打包并且压缩。
-
 使用命令tar -zcvf xx.tar.gz 文件来打包压缩，使用命令tar -zxvf xx.tar.gz来解压缩
 
 
