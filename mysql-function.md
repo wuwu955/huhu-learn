@@ -236,7 +236,8 @@ ORDER BY total_r desc;
 #查看sql在cpu 上的消耗
 show PROFILE cpu for QUERY @query_id;
 
-#通过trace 分析优化器如何生成执行计划
+
+#通过trace 分析优化器如何生成执行计划 (在终端操作)
 #查看 跟踪器是否打开  enabled=off,one_line=off
 show VARIABLES like 'optimizer%';
 #开启和设置最大数量 optimizer_trace_max_mem_size
@@ -247,7 +248,7 @@ select VARIABLE_VALUE into @a from performance_schema.session_status where varia
 /* 执行语句 */
 select city, name,age from t where city='杭州' order by name limit 1000;
 /* 查看 OPTIMIZER_TRACE 输出 这个要在命宁行才能看到trace 信息*/
-SELECT * FROM `information_schema`.`OPTIMIZER_TRACE`;
+SELECT * FROM `information_schema`.`OPTIMIZER_TRACE`\G;
 /* @b保存Innodb_rows_read的当前值 */
 select VARIABLE_VALUE into @b from performance_schema.session_status where variable_name = 'Innodb_rows_read';
 /* 计算Innodb_rows_read差值 */
