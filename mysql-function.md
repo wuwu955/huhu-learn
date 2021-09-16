@@ -242,7 +242,6 @@ show VARIABLES like 'optimizer%';
 #开启和设置最大数量 optimizer_trace_max_mem_size
 set optimizer_trace='enabled=on';
 set optimizer_trace_max_mem_size=1000000;
-select VARIABLE_VALUE into @a from performance_schema.session_status where variable_name = 'Innodb_rows_read';
 /* @a保存Innodb_rows_read的初始值 */
 select VARIABLE_VALUE into @a from performance_schema.session_status where variable_name = 'Innodb_rows_read';
 /* 执行语句 */
