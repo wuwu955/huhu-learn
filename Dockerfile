@@ -1,10 +1,10 @@
 FROM openjdk:8
 
 # 仅适用于java服务。前端服务和go应用不支持
-MAINTAINER zhaozhengxi <v_zhxizhao@tencent.com>
+MAINTAINER zw <zw@qq.com>
 
 # SW_AGENT_NAME 表示服务名，同时也是你编译后jar包的前缀名称。需要根据实际情况更改
-ENV SW_AGENT_NAME tenantadmin
+ENV SW_AGENT_NAME demo
 # JAR_NAME 表示编译后的jar包名称，与SW_AGENT_NAME变量挂钩。需要根据实际情况更改
 ENV JAR_NAME ${SW_AGENT_NAME}-1.0-SNAPSHOT.jar
 # APP_CONFIG 使用本地文件启动服务时需要填写，例如--spring.config.location=/data/config/application.yml；使用nacos作为配置中心则不需要填写
