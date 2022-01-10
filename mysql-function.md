@@ -592,6 +592,20 @@ select * from (select d.issue,d.q1,d.q2,d.q3,d.q4,d.q5,(@avg := @avg+1) average
 from dlt_result d order by d.issue asc) as tmp order by issue desc
 https://www.cnblogs.com/shuilangyizu/p/7866479.html
 
+ ``` 
+### 22 Group by  IF SUM MAX 函数的应用
+```
 
+ SELECT iccid, openid, max(IF(source = 3, expire_time, 0)) AS gift_end_time
+ 
+ , max(expire_time) AS maxExire, SUM( IF ( `status` IN (1, 4) AND source != 3, left_days, 0 ) ) AS  left_days
+
+ , ( max(expire_time) + ( SUM( IF ( `status` IN (1, 4) AND source != 3, left_days, 0 ) ) * 86400000 ) ) AS max_end_time 
+ 
+ FROM t_card_package WHERE `status` IN (1, 2, 3, 4) AND iccid IS NOT NULL GROUP BY iccid ;
+
+一个卡多个流量包 计算赠送类型的到期时间和购买类型的提取和冻结状态下的流量包总到期时间 
+根据最大过期时间加剩下可用天数来计算
+赠送到期时间 通过if 来标记值 不符合的取0 在max 函数取符合的值 因为 group by  总是取最近的一条记录
  ``` 
 				
