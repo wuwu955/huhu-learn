@@ -174,6 +174,7 @@ https://www.linuxprobe.com/linux-cpu-message.html
 #maven 环境变量问题
 https://blog.csdn.net/keeprunning95/article/details/81330825
 netstat -ano | findstr "9527"
+tasklist | findstr 8090
 taskkill /pid 19644 /f
 # 切换openjdk
 https://blog.csdn.net/nmj2015/article/details/72371591?utm_source=blogxgwz1
