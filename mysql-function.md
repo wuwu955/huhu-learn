@@ -371,6 +371,20 @@ AVG_ROW_LENGTH,table_rows,update_time
 FROM
 information_schema.tables
 WHERE table_schema = 'dbName' and table_name='tbName';
+# 查看所有表数据大小
+SELECT
+	table_name,
+	table_rows,
+	concat( round( ( index_length ) / 1024 / 1024 / 1024, 2 ), 'GB' ) index_length,
+	concat( round( ( data_length ) / 1024 / 1024 / 1024, 2 ), 'GB' ) data_length,
+	concat( round( ( data_length + index_length ) / 1024 / 1024 / 1024, 2 ), 'GB' ) table_size 
+FROM
+	information_schema.TABLES 
+WHERE
+	table_schema = 'dbName' 
+ORDER BY
+	table_size DESC
+
 #查看磁盘数据大小
 du -sh /datas/mysql/data/db/tableName*
 
