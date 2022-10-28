@@ -375,6 +375,7 @@ WHERE table_schema = 'dbName' and table_name='tbName';
 SELECT
 	table_name,
 	table_rows,
+	data_free,
 	concat( round( ( index_length ) / 1024 / 1024 / 1024, 2 ), 'GB' ) index_length,
 	concat( round( ( data_length ) / 1024 / 1024 / 1024, 2 ), 'GB' ) data_length,
 	concat( round( ( data_length + index_length ) / 1024 / 1024 / 1024, 2 ), 'GB' ) table_size 
