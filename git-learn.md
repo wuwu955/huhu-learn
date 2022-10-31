@@ -113,7 +113,7 @@ git merge origin/master --allow-unrelated-histories
 git push --set-upstream origin master
 ```
 
-## 8 克隆别人项目 修改后push 到自己仓库
+## 8 解决git clone过大的仓库
 ```
 1. 先浅层clone,只会拉取最近的一次提交
 
