@@ -89,3 +89,55 @@ git log --oneline dev | cut -d " " -f 1 | tail -1 | xargs git log
 4 git push -f origin master
 
 ```
+
+## 7 Git第一次推送到远程空仓库
+```
+初始化仓库
+git init
+
+提交代码
+git add.
+git commit -am “init”
+
+关联远程仓库
+git remote add origin <远程仓库ssh或者http地址>
+
+推送到远程目录
+git push -u origin master
+这个时候其实因为两个分支并不在一条线上，会报错refusing to merge unrelated histories
+
+允许合并
+git fetch
+git merge origin/master --allow-unrelated-histories
+再推送
+git push --set-upstream origin master
+```
+
+## 8 克隆别人项目 修改后push 到自己仓库
+```
+1. 先浅层clone,只会拉取最近的一次提交
+
+$ git clone --depth=1 http://xxx.git
+2. 浅层clone成功后，再完整拉取：
+
+ 1） 先转换存储库为完整存储库，消除浅层存储库所施加的所有限制 cd 到xxx 文件下再执行
+$ git fetch --unshallow 
+ 2） 命令修改.git文件夹内config文件的[remote "origin"]节的内容
+$ git remote set-branches origin '*'
+
+#若命令无法修改，可直接修改.git文件夹内config文件的[remote "origin"]节的内容
+修改前
+[remote "origin"]
+    url = https://xxx.com/abc/xxx.git
+    fetch = +refs/heads/master:refs/remotes/origin/master
+修改后
+[remote "origin"]
+    url = https://xxx.com/abc/xxx.git
+    fetch = +refs/heads/*:refs/remotes/origin/*
+以上步骤也可用命令代替
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+
+3.然后执行以下命令获取所有分支
+
+git fetch -pv 或 $ git fetch -v
+```
