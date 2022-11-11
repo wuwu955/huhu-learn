@@ -623,4 +623,11 @@ https://www.cnblogs.com/shuilangyizu/p/7866479.html
 根据最大过期时间加剩下可用天数来计算
 赠送到期时间 通过if 来标记值 不符合的取0 在max 函数取符合的值 因为 group by  总是取最近的一条记录
  ``` 
+### 23 mysqldump 导出表数据
+```
+1.在mysql 安装路径执行 例如 C:\Program Files\MySQL\MySQL Server 5.7\bin 下 cmd
+2. 执行如下语句 注意没有;号
+mysqldump -uroot -p paperless paperless_data>D:\sorx\paperless.sql
+3.输入密码就好了 dbnam tablename
+ ```
 				
