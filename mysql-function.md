@@ -630,4 +630,26 @@ https://www.cnblogs.com/shuilangyizu/p/7866479.html
 mysqldump -uroot -p paperless paperless_data>D:\sorx\paperless.sql
 3.输入密码就好了 dbnam tablename
  ```
-				
+### 24 分组取组内最新值
+```sql
+SELECT * from (
+SELECT id,
+IF(@p=deviceName,
+    CASE
+        WHEN @s=recentCipDateTime THEN @r
+        WHEN @s:=recentCipDateTime THEN @r:=@r+1
+    END,
+  @r:=1 ) AS rank,
+@p:=deviceName,
+@s:=recentCipDateTime
+FROM cip,(SELECT @p:=NULL,@s:=NULL,@r:=0)r
+WHERE
+recentCipDateTime BETWEEN FROM_UNIXTIME(1670728986) AND FROM_UNIXTIME(1673320986)
+and (deviceName LIKE '%BBT%' OR deviceName LIKE '%CPT%') 
+ORDER BY deviceName, recentCipDateTime DESC ) b 
+WHERE b.rank =1
+
+# 相关资料
+https://stackoverflow.com/questions/23608464/group-concat-with-limit
+https://www.bbsmax.com/A/o75Nx2eezW/
+ ```
