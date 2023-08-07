@@ -654,7 +654,7 @@ https://stackoverflow.com/questions/23608464/group-concat-with-limit
 https://www.bbsmax.com/A/o75Nx2eezW/
  ```
 ### 25 删除重复的数据
- ```
+```
 DELETE FROM mdm_pi_mapping_copy1 WHERE id NOT IN (
 SELECT t.id FROM (
 SELECT min(id)id from  mdm_pi_mapping_copy1 GROUP BY pi_name    ) t )
