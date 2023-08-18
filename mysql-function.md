@@ -629,6 +629,8 @@ https://www.cnblogs.com/shuilangyizu/p/7866479.html
 2. 执行如下语句 注意没有;号
 mysqldump -uroot -p paperless paperless_data>D:\sorx\paperless.sql
 3.输入密码就好了 dbnam tablename
+4.导入 use dbname;
+source D:\sorx\paperless.sql
  ```
 ### 24 分组取组内最新值
 ```sql
